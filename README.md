@@ -71,4 +71,12 @@ Rendering uses vanilla `SingleQuadParticle`, the lit translucent quad layer, and
 
 At most 24 nearest emitters and 256 live owned particles are tracked. Distance and Minecraft's particle setting reduce emission. Render interpolation smooths the 20 Hz simulation. Vanilla's particle alpha cutoff can remove the faintest parts of a dissolving wisp. The conservative first-person view-cone fade intentionally keeps the crosshair clear.
 
-See [PORTING.md](PORTING.md) for the reusable foundation, [ARCHITECTURE.md](ARCHITECTURE.md) for implementation boundaries, and [art/ASSETS.md](art/ASSETS.md) for original asset provenance. Code is released under CC0; the settings-screen foundation is adapted from Seamless Crafting's CC0 source.
+See [PORTING.md](PORTING.md) for the reusable foundation, [ARCHITECTURE.md](ARCHITECTURE.md) for implementation boundaries, and [art/ASSETS.md](art/ASSETS.md) for original asset provenance. Earlier code was released under CC0; the settings-screen foundation is adapted from Seamless Crafting's CC0 source. See the License section for the policy on new original material.
+
+## License
+
+**All Rights Reserved** for new original material owned by Derk Ottersberg.
+See [LICENSE.txt](LICENSE.txt) and [licensing history](LICENSES/README.md) for prior-license and third-party exceptions.
+
+Public source may be viewed and forked on GitHub. Issues and pull requests are welcome;
+write access to this repository is reserved for the owner.
