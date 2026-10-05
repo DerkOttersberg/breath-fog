@@ -1,4 +1,83 @@
-BREATH FOG 1.0.1 — FINAL POLICY PACKAGE REVALIDATION PENDING
+BREATH FOG 1.0.1+mc1.20.1 — UPDATED PRODUCTION ACCEPTANCE
 
-The earlier accepted default/icon update is preserved in docs/historical/TESTING-1.0.1-pre-policy.txt.
-Current metadata and packaged license notices changed after that acceptance; new exact JAR hashes require clean build/check and isolated client revalidation.
+Source branch: https://github.com/DerkOttersberg/breath-fog/tree/1.20.1
+Tested production source: 42f5ec1182d266a468e15f21023ee024ad28a469
+The acceptance manifest binds normalized source/build inputs to every installed
+runtime JAR, actual profile, PASS marker, driver snapshot and screenshot hash.
+Later documentation/QA changes do not change those accepted production bytes.
+
+DEFAULT STYLE AND ICON
+Fresh installs and configs without pixelated use pixelated breath by default.
+Explicit saved pixelated=false choices remain soft vapor. Reset defaults selects
+pixelated; Save persists it and Cancel discards drafts. The owner-supplied 400x400
+Kopie van Template(1).png is bundled unchanged under assets/breath_fog/icon.png.
+Icon SHA-256: 22a732a43e21bdda089c907b303e62b8bac1b0aba7db03b5f25800688d2811f5
+Every packaged loader gate verifies its exact bytes, valid dimensions and metadata.
+
+BUILD — PASSED
+Clean check build, no build cache, exit zero: build-1.0.1-final.log.
+13 JUnit tests executed, zero skipped/failed/errors. Fresh pixel defaults, partial
+config migration and explicit soft-style persistence are covered. Common-loader
+isolation and all 2 packaged-JAR checks passed. Correct metadata/dependencies,
+license, class bytecode, eight sprites and exclusion of QA/game/shaded-loader code
+are checked. Runtime JARs require only their documented loader/Fabric API dependencies.
+The current owner policy and preserved prior notices are included unchanged under
+META-INF/breath-fog, in runtime/source JARs and the accompanying source ZIP.
+Binary comparison with the preserved pre-policy packages confirms that every
+class and asset remains byte-identical; only notices and license metadata changed.
+
+UPDATED PACKAGED CLIENT MATRIX — PASSED
+fabric standalone: fabric-standalone-2, 22 scenarios, default/icon update revalidation.
+fabric combined: fabric-combined-2, 21 scenarios, default/icon update revalidation.
+fabric no-modmenu: fabric-no-modmenu-2, 21 scenarios, default/icon update revalidation.
+forge standalone: forge-standalone-2, 22 scenarios, default/icon update revalidation.
+forge combined: forge-combined-2, 21 scenarios, default/icon update revalidation.
+
+107 scenario executions across 5 final-byte profiles.
+Each runtime hash matches the installed JAR in every accepted profile. Genuine
+Minecraft/loader installations provide the classpath, without project classes.
+Separate QA helper JARs drive internal game controls and write PASS only after
+exit zero; they are never packaged in a shipping JAR or source archive as binaries.
+
+Fresh pixel defaults and real Reset defaults/Save are verified on every loader.
+Fabric exercises actual Mod Menu registration, with separate absence profiles.
+Forge/NeoForge native config factories work. Update checks cover both styles,
+camera views, settings, Save/Cancel/NaN rejection, pagination/resize, resource
+reload, preview and owned-particle cleanup. Legacy update profiles also exercise
+actual visibility toggles. Every standalone/absence profile joins
+an entirely unmodded matching vanilla loopback server and disconnects cleanly.
+Combined profiles contain matching SeamlessLib, Meteors, Crafting, Workbench and
+Throw Weapons JARs, verify restart persistence, and test a modded integrated world.
+Synthetic nearby actors are budget instrumentation, not actual multiplayer guests.
+
+UNCHANGED BEHAVIOR AND PRIOR DEEP COVERAGE
+The 1.0.0 full acceptance reports/manifests remain in docs/historical. All main
+Java renderer, controller, timing, lifecycle and platform-adapter source hashes
+apart from FogSettings match that prior acceptance. Those previous full runs
+covered cold/warm cadence, sprint/sneak/boat/sleep/death/respawn, particle caps,
+missing-sprite recovery/collision and Forge low-FPS timing. The earlier 1.0.1
+update acceptance, also preserved in docs/historical, reran the full behavior
+suite in its first 26.3 Fabric profiles. The final post-policy package profiles
+focus on the changed defaults/icon and their real game integrations;
+their individual scope and scenarios are recorded, without treating the old
+binary PASS markers as new-binary acceptance.
+
+ISOLATION, LOGS AND LIMITS
+WSL Ubuntu 24.04; private nonzero Xvfb; Windows/WSLg display targets removed.
+One client at a time through the shared lock, two client CPUs, low priority,
+1 GiB client heap and 600-second client runtime. There is no desktop input/focus
+automation. Owned vanilla servers receive graceful stdin stop after the matrix.
+Software graphics: llvmpipe/Mesa; 26.3 Vulkan and legacy OpenGL. Hardware GPU
+benchmarks, shader-pack matrix, authenticated LAN, second actual guest and
+exhaustive modpacks/resource packs remain unverified. Hosted CI is a separate gate.
+Offline auth/Realms, narrator/flite, OpenAL, loader tags/config defaults and existing
+companion data-fixer diagnostics are classified. Passing logs have no Breath Fog
+production stack trace. Failed attempts and their console logs remain preserved.
+Prior 1.0.0 acceptance is historical and does not certify these changed binaries.
+
+Exact runtime JAR SHA-256:
+fabric: 642b6a48393c63cd3d6070cc5ba355426acd90bf06c25dab45c8ee72fd968131
+forge: cb2a6120610bd66e37231d081e27271d59b42b5db1801274d4fcfa4b5bdab863
+
+Deliverables: C:/Users/derko/Desktop/minecraft/release-candidates/breath-fog/1.0.1/mc1.20.1
+Evidence: C:/Users/derko/Desktop/minecraft/qa-artifacts/breath-fog-1.0.1-mc1.20.1
