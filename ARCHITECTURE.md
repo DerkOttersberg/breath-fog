@@ -25,3 +25,9 @@ Selection work is bounded to a 24-item nearest list while scanning the current w
 ## Primary research
 
 The initial design research below belongs to the 26.2 foundation. The 26.3 port uses the current catalog pins, inspected official 26.3 classes, and fresh packaged-client acceptance on every supported loader. Historical shader and hardware results do not establish 26.3 acceptance.
+
+- [Seamless Crafting version catalog](https://github.com/DerkOttersberg/seamless-crafting/blob/26.2/gradle/libs.versions.toml): Gradle 9.5.1, Java 25, Architectury plugin 3.5.169, Loom 1.17.491, Loader 0.19.3, Fabric API 0.159.0+26.2.
+- [Fabric 26.2 update](https://fabricmc.net/2026/06/15/262.html) and [Fabric particle documentation](https://docs.fabricmc.net/develop/rendering/particles/creating-particles): current client APIs and vanilla rendering integration.
+- [Bridson, Hourihan and Nordenstam, Curl-Noise for Procedural Fluid Flow](https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph2007-curlnoise.pdf): the principle of deriving a divergence-free field from a vector potential. This MVP uses its own small analytic sinusoidal potential, rather than claiming a full fluid simulation or copying a solver.
+- [Iris 26.2 particle integration](https://github.com/IrisShaders/Iris/blob/26.2/common/src/main/java/net/irisshaders/iris/mixin/MixinParticleEngine.java): the standard particle submission path is integrated into Iris's rendering phases.
+- Minecraft 26.2's official client JAR was inspected locally to verify current APIs, atlas IDs, and the existing particle shader's alpha cutoff. These details were then checked in live game runs.

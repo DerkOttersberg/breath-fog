@@ -45,7 +45,7 @@ if len(sys.argv) > 6:
     for jar in pathlib.Path(sys.argv[6]).glob(f'*-{artifact_loader}.jar'):
         shutil.copy2(jar, client / 'mods')
     if artifact_loader == 'fabric':
-        menu = list(pathlib.Path('/root/.gradle/caches/modules-2/files-2.1/com.terraformersmc/modmenu/21.0.0').glob('*/*.jar'))
+        menu = list(pathlib.Path('/root/.gradle/caches/modules-2/files-2.1/com.terraformersmc/modmenu/21.0.0').glob('*/modmenu-21.0.0.jar'))
         if menu:
             shutil.copy2(menu[0], client / 'mods')
 cmd = json.loads((template / 'launch-command.json').read_text())

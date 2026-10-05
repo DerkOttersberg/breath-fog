@@ -5,7 +5,10 @@ SOURCE AND ARTIFACTS
 Cloned https://github.com/DerkOttersberg/breath-fog at
 4223c7380d6bddbe64ca6887dc340df26532816c (26.2 foundation).
 Implemented the port on local branch 26.3. CC0-1.0 identity is preserved.
-Source is maintained on branch 26.3. Local acceptance is separate from hosted CI.
+Production source: 637e2e9b4b9210346357f7a0b1d3a8d61366b7ac (26.3).
+Subsequent documentation/QA driver changes do not change runtime bytes.
+.github/acceptance/acceptance.json records source inputs and exact installed hashes.
+Local acceptance is separate from hosted CI.
 
 Runtime JAR SHA-256:
 Fabric: a759618dfa7932fda9e6ffdd4e5db4113ce7269e13bb50f9f6a66ae7472f6504
@@ -39,7 +42,7 @@ Tests cover cold eligibility/exposure, independent idle/sprint cadence,
 suppression without queued bursts, emission allocation and budgets, camera
 fade, curl/wakes, backward-compatible config defaults, pixel persistence,
 partial configs, numeric validation, and byte-preserving invalid-file backups.
-GitHub CI now builds/checks/uploads Fabric, Forge and NeoForge artifacts;
+GitHub CI is configured to build/check/upload Fabric, Forge and NeoForge artifacts;
 local acceptance is separate from a hosted CI run.
 
 PACKAGED CLIENT MATRIX
