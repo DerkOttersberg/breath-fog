@@ -65,7 +65,6 @@ public abstract class SettingsScreen extends Screen {
                 Row row = visible.get(i);
                 row.widget.setRectangle(controlWidth, 20,
                     this.left + this.contentWidth - controlWidth - 8, 74 + i * ROW_HEIGHT);
-                row.widget.setTooltip(Tooltip.create(Component.literal(row.label + "\n" + row.help)));
                 this.addRenderableWidget(row.widget);
             }
         }
@@ -150,9 +149,9 @@ public abstract class SettingsScreen extends Screen {
                     row.widget.getX() - this.left - 16, 0xFFFFFFFF, false);
                 drawFitted(graphics, row.help, this.left + 8, y + 24, this.contentWidth - 16, 0xFFAFBDCF, false);
                 if (mouseX >= this.left && mouseX < this.left + this.contentWidth
-                    && mouseY >= y && mouseY < y + 34 && !row.widget.isMouseOver(mouseX, mouseY)) {
+                    && mouseY >= y && mouseY < y + 34) {
                     graphics.setTooltipForNextFrame(this.font,
-                        Component.literal(row.label + "\n" + row.help), mouseX, mouseY);
+                        this.font.split(Component.literal(row.label + "\n" + row.help), Math.min(260, this.width - 24)), mouseX, mouseY);
                 }
             }
         }

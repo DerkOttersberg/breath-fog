@@ -1,33 +1,15 @@
-# Porting foundation
+# Porting
 
-The starting reference was [Seamless Crafting, branch 26.2](https://github.com/DerkOttersberg/seamless-crafting/tree/26.2), inspected at commit `74ec7fb8ea0fc055b95a4297ea7bd9a056702550`. Its [porting guide](https://github.com/DerkOttersberg/seamless-crafting/blob/26.2/PORTING.md), shared common module, explicit platform services, catalog, isolation checks, and packaged-loader checks are the foundation reused here. This is a standalone mod with its own identity and client-only design.
+Branch `26.3` contains common code and Fabric, Forge, and NeoForge adapters for Minecraft 26.3 / Java 25. Branch `26.2` preserves the Fabric MVP. Keep one Minecraft version per branch with all supported loaders together.
 
-## What transfers
+`common/core` is portable Java; `common/config` uses Minecraft's Gson. `common/client` contains target-version Minecraft rendering and settings. Explicit `ClientPlatformServices` provides the loader name and config directory. Loader modules own initialization, tick/disconnect events, local commands, and native config access. Common imports no loader APIs. No runtime Architectury API, reflective adapter discovery, synchronized particle registry, networking, or sibling gameplay dependency is used.
 
-- `common/core`: plain Java breathing, cold exposure, camera attenuation, analytic curl/wakes, and emission budgets. No Minecraft or loader imports; deterministic tests run without a game.
-- `common/config`: settings validation, recovery, and atomic persistence. No loader imports. Gson is supplied by Minecraft at runtime.
-- `common/client`: Minecraft-specific particle simulation and submission, emitter orchestration, and settings UI. Shared by loaders within this Minecraft version; this layer still needs adaptation across Minecraft versions.
-- `common/platform/ClientPlatformServices`: the loader explicitly supplies its name and configuration path to the shared bootstrap. No reflection or service discovery.
-- `fabric`: initialization, tick/disconnect hooks, resource-reload registration, client commands, and optional Mod Menu integration. All Fabric imports stay here.
-- `gradle/libs.versions.toml`: Minecraft, Java, build plugins, loader, API, and test dependency pins in one place.
+Fabric bundles common output. Forge and NeoForge compile common sources/resources into their own JARs. Forge initializes client code only on the client distribution; NeoForge's entrypoint declares `Dist.CLIENT`. A server requires no installation.
 
-Architectury supplies build tooling. There is no Architectury API mod dependency and no runtime transformation of common code. Fabric's JAR bundles common output directly. The compile-only Loader annotation dependency in common supports annotations on Loom's merged Minecraft classes; no loader APIs are imported or shipped by common.
+For a new version, check real particle construction/extraction, camera and atlas APIs, UI/input methods, loader events, native config registration, resource format, and metadata constraints. Minecraft 26.3 uses `LocalPlayer.sendSystemMessage`, `Minecraft.resizeGui`, and input-aware Button callbacks. Atlas lookup uses `AtlasIds.PARTICLES`. The controller detects replaced atlases/sprites before emitting after reload; Fabric also supplies an apply-phase reload callback.
 
-## Add another loader within 26.2
+Run `clean check build`, inspect the exact packaged artifacts, and playtest every loader using its production installation. Shared visual tests need an actual world; server GameTests do not exercise this client-only renderer. QA source sets produce separate helper JARs; they never enter distributables. Keep private-display isolation and copied profiles/worlds.
 
-1. Add a thin loader project, dependency catalog entries, loader metadata, and its build configuration. Do not add its imports to common.
-2. Implement `ClientPlatformServices` and explicitly call `BreathFogClient.initialize` once.
-3. Wire client end-tick and disconnect events. Invoke `resourcesReloaded` after resource reload; shared code reacquires sprites on the next client tick.
-4. Register loader-native local config/preview commands and optional settings-menu integration.
-5. Bundle common classes/resources and the CC0 license. Keep metadata client-only. Preserve namespaced additive atlas sources and direct particle instances: do not add a synchronized particle registry.
-6. Add isolation rules, that loader's packaged-JAR assertions, and a CI job. Run genuine game, server, unmodded LAN guest, and shader checks; compilation does not establish compatibility.
+Use [TESTING.txt](TESTING.txt) to record actual passes and limitations. A different version or loader needs compatible code plus new runtime evidence, not wider metadata ranges.
 
-## Add another Minecraft version
-
-Use a version branch such as `1.21.11` or the desired actual release. Keep the stable mod ID `breath_fog`, package `io.github.derkottersberg.breathfog`, config name `breath_fog.json`, and asset namespace. Update pins once in the catalog and version constraints/resource format in metadata. Reuse the pure core and its tests.
-
-Adapt the shared Minecraft layer deliberately. Check particle construction, render-state extraction and layer names, camera vectors/position, atlas lookup, biome access, pose/eye position, collision, GUI extraction, and resource reload APIs. Check loader APIs and Mod Menu separately. Minecraft 26.2 `AtlasManager.getAtlasOrThrow` accepts **`AtlasIds.PARTICLES`**, not the texture location `TextureAtlas.LOCATION_PARTICLES`; confusing these compiled successfully but crashed on the first cold-biome emission during testing.
-
-Run `clean check build`. `verifyCommonIsolation` blocks loader imports in common and Minecraft imports in core. `verifyLoaderJar` checks client identity, version, common code, asset dimensions and transparent borders, license, additive atlas content, and absence of QA code, embedded dependencies, renderer mixins, foreign loader metadata, and core shaders.
-
-Start with one loader that actually builds and runs. Empty loader projects would imply unsupported targets. The repository deliberately ships only Fabric 26.2 until additional ports are implemented and tested.
+Forge 66.0.9's legacy tick and command events miss parts of the 26.3 in-world loop, as verified by the QA render probe. Forge-only lifecycle/command mixins bridge those paths. The simulation hook runs at the end of `Minecraft.tick`; a frame hook also handles menu requests and level changes. The shared controller advances once per client game time value, preventing double updates if both hooks or the native event fire. Simulation timing is therefore independent of how often frames render. These hooks do not replace shaders, particle rendering, or framebuffers.

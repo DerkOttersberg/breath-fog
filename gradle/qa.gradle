@@ -1,0 +1,17 @@
+// Opt-in, separately packaged instrumentation. Never part of a release JAR.
+if (project.hasProperty('qa')) {
+    sourceSets.create('qa') {
+        java.srcDir rootProject.file('common/src/qa/java')
+        compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
+        runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
+    }
+    configurations {
+        qaImplementation.extendsFrom implementation
+        qaRuntimeOnly.extendsFrom runtimeOnly
+    }
+    tasks.register('qaHelperJar', Jar) {
+        from sourceSets.qa.output
+        archiveFileName = "breath-fog-qa-${project.name}.jar"
+        if (project.name == 'forge') manifest { attributes 'MixinConfigs': 'breathfog-qa.mixins.json' }
+    }
+}

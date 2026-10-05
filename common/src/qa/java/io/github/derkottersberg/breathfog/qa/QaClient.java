@@ -5,15 +5,17 @@ import com.mojang.authlib.GameProfile;
 import io.github.derkottersberg.breathfog.client.*;
 import java.nio.file.*;
 import java.util.*;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+
+
+
 import net.minecraft.client.*;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.world.entity.Entity;
 
 /** File-driven development instrumentation. No part of this helper is shipped in the mod. */
-public final class QaClient implements ClientModInitializer {
+public final class QaClient {
+    public static QaClient active;
+    public static java.util.function.Function<net.minecraft.client.gui.screens.Screen, net.minecraft.client.gui.screens.Screen> nativeConfigFactory;
     private static final Gson JSON = new GsonBuilder().setPrettyPrinting().create();
     private Path root;
     private long ticks, lastFrame;
@@ -27,15 +29,60 @@ public final class QaClient implements ClientModInitializer {
     private double actorMotion;
     private String drive="none";
     private String lastError="";
-    public void onInitializeClient() {
-        root=Minecraft.getInstance().gameDirectory.toPath().resolve("qa");
-        try { Files.createDirectories(root); } catch (Exception e) { throw new RuntimeException(e); }
-        ClientTickEvents.END_CLIENT_TICK.register(this::tick);
-        LevelRenderEvents.END_MAIN.register(context -> render());
+    private boolean inTick;
+    private String capturedShot="";
+    private int capturedParticles;
+    private java.util.concurrent.CompletableFuture<Void> resourceReload;
+    private long renderSample;
+    private long renderTick;
+    public void tickFromRender(Minecraft client) {
+        long now=System.nanoTime();
+        if (now-renderTick<50_000_000L) return;
+        renderTick=now;
+        tick(client);
     }
-    private void tick(Minecraft client) {
+    public void observeRender(Minecraft client) {
+        long now=System.nanoTime();
+        if (now-renderSample<1_000_000_000L) return;
+        renderSample=now;
+        JsonObject diagnostic=new JsonObject();
+        diagnostic.addProperty("world",client.level!=null);
+        diagnostic.addProperty("paused",client.isPaused());
+        diagnostic.addProperty("tickCallbacks",ticks);
+        diagnostic.addProperty("controllerTicks",BreathFogClient.instance().tickTime());
+        diagnostic.addProperty("singletonMatches",client==Minecraft.getInstance());
+        diagnostic.addProperty("screen",client.gui.screen()==null ? "none" : client.gui.screen().getClass().getSimpleName());
+        if (client.level!=null) {
+            diagnostic.addProperty("frozen",client.level.tickRateManager().isFrozen());
+            diagnostic.addProperty("rate",client.level.tickRateManager().tickrate());
+            diagnostic.addProperty("gameTime",client.level.getGameTime());
+        }
+        try { Files.writeString(root.resolve("render-status.json"),JSON.toJson(diagnostic)); }
+        catch(Exception e) { throw new IllegalStateException(e); }
+    }
+    public void initialize() {
+        initialize(Minecraft.getInstance().gameDirectory.toPath());
+    }
+    public void initialize(Path directory) {
+        active=this;
+        root=directory.resolve("qa");
+        try { Files.createDirectories(root); } catch (Exception e) { throw new RuntimeException(e); }
+
+
+    }
+    public void tick(Minecraft client) {
+        if (inTick) return;
+        inTick=true;
         ticks++;
         try {
+            if (ticks==1) {
+                client.options.pauseOnLostFocus=false;
+                client.options.inactivityFpsLimit().set(InactivityFpsLimit.MINIMIZED);
+                client.options.renderDistance().set(5);
+                client.options.simulationDistance().set(5);
+                client.options.enableVsync().set(false);
+                client.options.framerateLimit().set(60);
+            }
             Path control=root.resolve("control.json");
             if (Files.exists(control)) {
                 JsonObject command=JsonParser.parseString(Files.readString(control)).getAsJsonObject();
@@ -68,16 +115,23 @@ public final class QaClient implements ClientModInitializer {
             if (ticks%5==0) {
                 JsonObject status=new JsonObject(); status.addProperty("id",requestId);
                 status.addProperty("ticks",ticks); status.addProperty("world",client.level!=null);
+                status.addProperty("controllerTicks",BreathFogClient.instance().tickTime());
+                status.addProperty("paused",client.isPaused());
+                status.addProperty("reloading",resourceReload!=null && !resourceReload.isDone());
                 status.addProperty("particles",BreathFogClient.instance().liveParticles());
                 status.addProperty("peak",peak); status.addProperty("error",lastError);
                 status.addProperty("screen",client.gui.screen()==null ? "none":client.gui.screen().getClass().getSimpleName());
+                status.addProperty("pixelated",BreathFogClient.instance().settings().pixelated);
+                status.addProperty("capturedShot",capturedShot);
+                status.addProperty("capturedParticles",capturedParticles);
                 status.addProperty("camera",client.options.getCameraType().name());
                 status.addProperty("fov",client.options.fov().get());
                 status.addProperty("throttle",client.getFramerateLimitTracker().getThrottleReason().name());
                 var emitters=BreathFogClient.class.getDeclaredField("emitters"); emitters.setAccessible(true);
                 status.addProperty("emitters",((Map<?,?>)emitters.get(BreathFogClient.instance())).size());
                 status.addProperty("actors",actors.size()); status.addProperty("measuring",measurement);
-                if (client.player!=null) {
+                if (client.player!=null && client.level!=null) {
+                    status.addProperty("gameTime",client.level.getGameTime());
                     status.addProperty("position",client.player.position().toString());
                     status.addProperty("biome",client.level.getBiome(client.player.blockPosition()).unwrapKey().map(k->k.identifier().toString()).orElse("unknown"));
                     status.addProperty("players",client.level.players().size());
@@ -97,6 +151,7 @@ public final class QaClient implements ClientModInitializer {
                 Files.writeString(root.resolve("status.json"),JSON.toJson(status));
             }
         } catch (Exception e) { lastError=e.toString(); e.printStackTrace(); }
+        finally { inTick=false; }
     }
     private void apply(Minecraft client,JsonObject command) throws Exception {
         client.options.pauseOnLostFocus=false;
@@ -110,13 +165,38 @@ public final class QaClient implements ClientModInitializer {
             if (command.has("intensity")) settings.intensity=command.get("intensity").getAsDouble();
             BreathFogClient.instance().updateSettings(settings);
         }
+        if (command.has("pixelated")) { var settings=BreathFogClient.instance().settings(); settings.pixelated=command.get("pixelated").getAsBoolean(); BreathFogClient.instance().updateSettings(settings); }
         if (command.has("closeScreen")) client.gui.setScreen(null);
         if (command.has("config")) client.setScreenAndShow(new BreathFogConfigScreen(client.gui.screen()));
+        if (command.has("nativeConfig")) {
+            if (nativeConfigFactory==null) throw new IllegalStateException("Native config integration is unavailable");
+            client.setScreenAndShow(nativeConfigFactory.apply(client.gui.screen()));
+        }
+        if (command.has("uiText") && client.gui.screen()!=null) {
+            for (var child:client.gui.screen().children()) {
+                if (child instanceof net.minecraft.client.gui.components.EditBox field) { field.setValue(command.get("uiText").getAsString()); break; }
+            }
+        }
+        if (command.has("guiScale")) { client.options.guiScale().set(command.get("guiScale").getAsInt()); client.resizeGui(); }
+        if (command.has("uiClick") && client.gui.screen()!=null) {
+            String label=command.get("uiClick").getAsString();
+            boolean found=false;
+            for (var child:client.gui.screen().children()) {
+                if (child instanceof net.minecraft.client.gui.components.Button button && button.getMessage().getString().equals(label)) {
+                    button.onPress(new net.minecraft.client.input.MouseButtonInfo(0,0)); found=true; break;
+                }
+            }
+            if (!found) throw new IllegalStateException("UI button not found: "+label);
+        }
         if (command.has("clientCommand") && client.player!=null) {
             client.player.connection.sendCommand(command.get("clientCommand").getAsString());
             client.gui.setScreen(null); // Mirror vanilla chat's close-on-submit after dispatch.
         }
         if (command.has("preview")) BreathFogClient.instance().preview();
+        if (command.has("cancelPreview")) {
+            var field=BreathFogClient.class.getDeclaredField("previewUntil"); field.setAccessible(true);
+            field.setLong(BreathFogClient.instance(),BreathFogClient.instance().tickTime());
+        }
         if (command.has("drive")) drive=command.get("drive").getAsString();
         if (command.has("respawn") && client.player!=null) client.player.respawn();
         if (command.has("useBlock") && client.player!=null) {
@@ -148,7 +228,7 @@ public final class QaClient implements ClientModInitializer {
             }
         }
         if (command.has("motion")) actorMotion=command.get("motion").getAsDouble();
-        if (command.has("reload")) client.reloadResourcePacks();
+        if (command.has("reload")) resourceReload=client.reloadResourcePacks();
         if (command.has("connect")) {
             client.disconnectWithSavingScreen();
             String address=command.get("connect").getAsString();
@@ -176,6 +256,7 @@ public final class QaClient implements ClientModInitializer {
             measureUntil=ticks+(command.has("seconds") ? command.get("seconds").getAsInt():20)*20;
         }
         if (command.has("stop")) client.stop();
+        if (command.has("fps")) client.options.framerateLimit().set(command.get("fps").getAsInt());
     }
     private void render() {
         long now=System.nanoTime();
@@ -185,6 +266,8 @@ public final class QaClient implements ClientModInitializer {
     private void capture(Minecraft client) {
         if (shot!=null && shotReadyAt<0 && BreathFogClient.instance().liveParticles()>=shotMinimum) shotReadyAt=(int)ticks+5;
         if (shot!=null && ((shotReadyAt>=0 && ticks>=shotReadyAt) || ticks>=shotDeadline)) {
+            capturedShot=shot;
+            capturedParticles=BreathFogClient.instance().liveParticles();
             Path file=root.resolve(shot+".png"); shot=null;
             Screenshot.takeScreenshot(client.gameRenderer.mainRenderTarget(),image -> {
                 try { image.writeToFile(file); } catch (Exception e) { e.printStackTrace(); } finally { image.close(); }
@@ -192,3 +275,4 @@ public final class QaClient implements ClientModInitializer {
         }
     }
 }
+

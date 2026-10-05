@@ -16,6 +16,7 @@ public final class SettingsStore {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final Path path;
     private final Consumer<String> warning;
+    private boolean recoveredInvalidFile;
     public SettingsStore(Path directory, Consumer<String> warning) {
         this.path = directory.resolve("breath_fog.json"); this.warning = warning;
     }
@@ -31,6 +32,7 @@ public final class SettingsStore {
             settings.sanitize();
             return settings;
         } catch (IOException | JsonParseException | IllegalStateException e) {
+            recoveredInvalidFile = true;
             warning.accept("Breath Fog is using defaults; the original configuration was preserved: " + e.getMessage());
             return new FogSettings();
         }
@@ -38,6 +40,12 @@ public final class SettingsStore {
     public void save(FogSettings settings) throws IOException {
         FogSettings checked = settings.copy(); checked.sanitize();
         Files.createDirectories(path.getParent());
+        if (recoveredInvalidFile && Files.exists(path)) {
+            Path backup = Files.createTempFile(path.getParent(), "breath_fog-invalid-", ".json.bak");
+            Files.copy(path, backup, StandardCopyOption.REPLACE_EXISTING);
+            warning.accept("Preserved invalid Breath Fog configuration at " + backup.getFileName());
+            recoveredInvalidFile = false;
+        }
         Path temporary = Files.createTempFile(path.getParent(), "breath_fog-", ".tmp");
         try {
             Files.writeString(temporary, GSON.toJson(checked) + System.lineSeparator(), StandardCharsets.UTF_8);

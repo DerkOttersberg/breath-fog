@@ -1,6 +1,40 @@
-{"sources":[
-  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_0"},
-  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_1"},
-  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_2"},
-  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_3"}
-]}
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "breath_fog:particle/wisp_0"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "breath_fog:particle/wisp_1"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "breath_fog:particle/wisp_2"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "breath_fog:particle/wisp_3"
+    },
+    {
+      "resource": "breath_fog:particle/pixel_wisp_0",
+      "type": "minecraft:single",
+      "sprite": "breath_fog:particle/pixel_wisp_0"
+    },
+    {
+      "resource": "breath_fog:particle/pixel_wisp_1",
+      "type": "minecraft:single",
+      "sprite": "breath_fog:particle/pixel_wisp_1"
+    },
+    {
+      "resource": "breath_fog:particle/pixel_wisp_2",
+      "type": "minecraft:single",
+      "sprite": "breath_fog:particle/pixel_wisp_2"
+    },
+    {
+      "resource": "breath_fog:particle/pixel_wisp_3",
+      "type": "minecraft:single",
+      "sprite": "breath_fog:particle/pixel_wisp_3"
+    }
+  ]
+}

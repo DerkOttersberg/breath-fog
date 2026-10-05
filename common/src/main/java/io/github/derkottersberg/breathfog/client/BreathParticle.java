@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 public final class BreathParticle extends SingleQuadParticle {
     private final BreathFogClient controller;
     private final boolean ownPlayer;
+    private final boolean pixelated;
     private final double cold, phase, startSize, endSize;
     private final double[] force=new double[3];
     private double collisionFade=1;
@@ -19,12 +20,13 @@ public final class BreathParticle extends SingleQuadParticle {
                           boolean ownPlayer, double cold, BreathFogClient controller) {
         super(level,origin.x,origin.y,origin.z,sprite);
         this.controller=controller; this.ownPlayer=ownPlayer; this.cold=cold;
+        this.pixelated=controller.currentSettings().pixelated;
         this.xd=velocity.x; this.yd=velocity.y; this.zd=velocity.z;
         this.lifetime=18+random.nextInt(9);
         this.hasPhysics=true;
         this.setSize(0.07f,0.07f);
         this.phase=random.nextDouble()*Math.PI*2;
-        this.roll=this.oRoll=(float)(phase);
+        this.roll=this.oRoll=pixelated ? 0 : (float)(phase);
         this.startSize=0.058+random.nextDouble()*0.020;
         this.endSize=0.27+random.nextDouble()*0.09;
         this.quadSize=(float)startSize;
@@ -44,12 +46,14 @@ public final class BreathParticle extends SingleQuadParticle {
         if (onGround || Math.abs((x-xo)-requestedX)>0.0001 || Math.abs((y-yo)-requestedY)>0.0001 || Math.abs((z-zo)-requestedZ)>0.0001) {
             collisionFade*=0.70; xd*=0.7; yd*=0.7; zd*=0.7;
         }
-        roll+=0.009f*(float)Math.sin(phase+age*0.11);
+        if (!pixelated) roll+=0.009f*(float)Math.sin(phase+age*0.11);
         if (collisionFade<0.025) remove();
     }
     @Override public float getQuadSize(float partialTick) {
         double t=Math.min(1,(age+partialTick)/lifetime);
-        return (float)(startSize+(endSize-startSize)*CameraComfort.smooth(0,1,t));
+        double growth=CameraComfort.smooth(0,1,t);
+        if (pixelated) growth=Math.floor(growth*8)/8;
+        return (float)(startSize+(endSize-startSize)*growth);
     }
     @Override public void extract(QuadParticleRenderState state, Camera camera, float partialTick) {
         var config=controller.currentSettings();

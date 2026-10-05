@@ -12,11 +12,12 @@
     "modmenu": ["io.github.derkottersberg.breathfog.fabric.BreathFogModMenu"]
   },
   "depends": {
-    "fabricloader": ">=0.19.3",
-    "fabric-api": ">=0.159.0 <0.160.0",
-    "minecraft": "26.2",
+    "fabricloader": ">=0.19.5",
+    "fabric-api": ">=0.161.0 <0.162.0",
+    "minecraft": "26.3",
     "java": ">=25"
   },
-  "suggests": { "modmenu": ">=20.0.3" },
+  "suggests": { "modmenu": ">=21.0.0" },
+  "contact": {"sources":"https://github.com/DerkOttersberg/breath-fog", "issues":"https://github.com/DerkOttersberg/breath-fog/issues"},
   "icon": "assets/breath_fog/icon.png"
 }

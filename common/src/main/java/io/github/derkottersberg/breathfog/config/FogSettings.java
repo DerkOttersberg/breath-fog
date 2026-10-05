@@ -5,12 +5,14 @@ public final class FogSettings {
     public boolean firstPerson = true;
     public boolean thirdPerson = true;
     public boolean nearbyPlayers = true;
+    public boolean pixelated = false;
     public double intensity = 1.0;
     public double firstPersonIntensity = 1.0;
     public FogSettings copy() {
         FogSettings result = new FogSettings();
         result.enabled = enabled; result.firstPerson = firstPerson; result.thirdPerson = thirdPerson;
         result.nearbyPlayers = nearbyPlayers; result.intensity = intensity;
+        result.pixelated = pixelated;
         result.firstPersonIntensity = firstPersonIntensity;
         return result;
     }

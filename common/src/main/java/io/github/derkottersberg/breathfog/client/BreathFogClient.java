@@ -38,10 +38,13 @@ public final class BreathFogClient {
     private final HashSet<UUID> selectedIds = new HashSet<>(32);
     private final ArrayList<BreathParticle> particles = new ArrayList<>(FogBudget.LIVE_CAP);
     private final TextureAtlasSprite[] sprites = new TextureAtlasSprite[4];
+    private TextureAtlas spriteAtlas;
     private final double[][] wakes = new double[8][6];
     private int wakeCount;
     private long tick, previewUntil;
+    private long processedGameTick = Long.MIN_VALUE;
     private boolean previewRequested;
+    private boolean settingsScreenRequested;
     private ClientLevel level;
     private ClientPlatformServices platform;
     private SettingsStore store;
@@ -62,19 +65,27 @@ public final class BreathFogClient {
     FogSettings currentSettings() { return settings; }
     public void updateSettings(FogSettings next) throws IOException {
         FogSettings checked = next.copy(); checked.sanitize();
-        store.save(checked); settings = checked;
-        if (!settings.enabled) clearParticles();
+        store.save(checked);
+        if (!checked.enabled || checked.pixelated != settings.pixelated) {
+            clearParticles();
+            java.util.Arrays.fill(sprites, null);
+            spritesMissing = false;
+        }
+        settings = checked;
     }
     public void preview() {
         previewUntil = tick + 400;
         previewRequested=true;
     }
+    public void requestSettingsScreen() { settingsScreenRequested=true; }
     /** Apply-phase callback; sprites are reacquired only after reload completion. */
     public void resourcesReloaded() { reloadPending = true; }
     public void clear() {
         clearParticles(); emitters.clear(); candidates.clear(); selectedIds.clear(); wakeCount = 0; level = null; previewUntil = 0; previewRequested=false;
         for (int i=0; i<sprites.length; i++) sprites[i] = null;
         spritesMissing=false;
+        spriteAtlas=null;
+        processedGameTick=Long.MIN_VALUE;
     }
     private void clearParticles() {
         // Remove only particles owned by this mod. Never clear vanilla/other mods' particles.
@@ -84,15 +95,27 @@ public final class BreathFogClient {
     public int liveParticles() { return particles.size(); }
     public long tickTime() { return tick; }
     public void tick(Minecraft client) {
+        if (settingsScreenRequested) {
+            settingsScreenRequested=false;
+            client.setScreenAndShow(new BreathFogConfigScreen(null));
+        }
         if (client.level != level) { clear(); level = client.level; }
         if (level == null || client.player == null) return;
         if (client.isPaused()) return;
+        // Some loader versions expose both a world-loop hook and a client tick hook.
+        // A frame callback may be faster than simulation: process each game tick only once.
+        long gameTick=level.getGameTime();
+        if (gameTick==processedGameTick) return;
+        processedGameTick=gameTick;
         tick++;
-        if (reloadPending) {
+        TextureAtlas atlas=client.getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES);
+        if (reloadPending || spriteAtlas != atlas || (sprites[0] != null &&
+                sprites[0] != atlas.getSprite(BreathFog.id("particle/"+(settings.pixelated ? "pixel_wisp_0" : "wisp_0"))))) {
             clearParticles();
             for (int i=0; i<sprites.length; i++) sprites[i]=null;
             spritesMissing=false;
             reloadPending=false;
+            spriteAtlas=atlas;
         }
         for (int i=particles.size()-1; i>=0; i--) if (!particles.get(i).isAlive()) particles.remove(i);
         if (!settings.enabled) { wakeCount=0; emitters.clear(); return; }
@@ -154,7 +177,7 @@ public final class BreathFogClient {
         if (sprites[0]==null) {
             TextureAtlas atlas=client.getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES);
             for (int i=0; i<sprites.length; i++) {
-                sprites[i]=atlas.getSprite(BreathFog.id("particle/wisp_"+i));
+                sprites[i]=atlas.getSprite(BreathFog.id("particle/"+(settings.pixelated ? "pixel_wisp_" : "wisp_")+i));
                 if (sprites[i]==atlas.missingSprite()) {
                     LogUtils.getLogger().warn("Breath Fog vapor sprites are missing; emission is suspended until resource reload.");
                     spritesMissing=true;

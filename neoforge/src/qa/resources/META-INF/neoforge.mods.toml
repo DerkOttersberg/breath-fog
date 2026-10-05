@@ -1,0 +1,7 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="CC0-1.0"
+[[mods]]
+modId="breath_fog_qa"
+version="1.0.0"
+displayName="Breath Fog QA (never distribute)"

@@ -1,0 +1,162 @@
+BREATH FOG 0.1.0 — ACTUAL TEST REPORT
+Minecraft 26.2 / Fabric. Test date: 5 October 2026.
+
+Delivered build
+breath-fog-0.1.0+mc26.2-fabric.jar
+SHA-256: B9136AA55300AD4180F11D848CD1DD2D9441F8DFCE3F27E601EA4FE36740B821
+This is a playable MVP. The completed checks below establish a working
+build and several real compatibility cases, rather than exhaustive release
+certification across every pose, mod, shader configuration, or computer.
+
+BUILD AND AUTOMATED VERIFICATION — PASSED
+Java 25, Gradle 9.5.1, Architectury plugin 3.5.169 / Loom 1.17.491,
+Fabric Loader 0.19.3, Fabric API 0.159.0+26.2.
+Final clean check build: successful; 10 JUnit tests, zero failures/errors.
+The delivered source ZIP was also extracted into a separate directory and
+rebuilt successfully with the same verification tasks and all 10 tests.
+Tests cover temperature/tag eligibility, ten-tick exposure blending,
+idle/sprint cadence ranges, independent phases, suppression without queued
+breaths, seven-tick emission allocation, distance/particle-setting budgets,
+camera attenuation and fade envelope, analytic curl, bounded wakes,
+stationary/teleport rejection, config persistence, corrupt-file recovery,
+partial configs and numeric validation.
+
+Packaged-JAR checks verified the client-only identity, Minecraft/Java
+requirements, bootstrap, bundled common classes, license, mod icon,
+four 128x128 RGBA textures with transparent borders, and four additive,
+namespaced particle-atlas entries. They reject QA classes, embedded game
+or Fabric classes, renderer mixins, foreign loader metadata and core shaders.
+Common isolation checks passed: no loader references in common and no
+Minecraft references in the portable core. Fabric-only CI is configured.
+After publishing to GitHub, the hosted job could not start: GitHub reported
+that the account is locked due to a billing issue. This is not a compilation
+or test failure; no workflow steps ran. The completed build/tests are local.
+See evidence/build-log.txt and the two JUnit XML reports.
+
+PACKAGED CLIENT — PASSED
+The final JAR was installed in an isolated mods folder and launched through
+Fabric's normal KnotClient entrypoint against the official Minecraft client
+JAR. No project classes, resources or common development JAR were present
+on its launch classpath. Separate opt-in QA instrumentation recorded status,
+screenshots and frame intervals; it is absent from the distributed JAR.
+
+Cold snowy-taiga emission, first person, front/rear third-person switching,
+and FOV 30/70/110 were exercised. /breathfog config opened through the
+registered client command, including the normal chat close-after-submit
+behavior. /breathfog preview was dispatched as a client command.
+Resource reload completed and emission resumed with reacquired sprites.
+Disabling removed owned particles and emitters; disconnect left both at zero.
+With 48 moving synthetic remote players, the final controller tracked at
+most 24 emitters and the ten-second sample peaked at 146 live particles,
+below the 256 cap. Synthetic actors test budgets and motion; they are not
+evidence of actual multiplayer connections. See the corresponding JSON files.
+
+REAL MULTIPLAYER — VANILLA SERVER CASE PASSED; LAN UNVERIFIED
+A Fabric viewer and an entirely unmodded 26.2 client joined the same
+unmodified, dedicated vanilla 26.2 server on localhost. The server and
+guest had no Fabric installation. This isolated development fixture used
+offline development identities; authenticated online-mode play was not tested.
+Both clients joined successfully. A cold-biome sample tracked two real players.
+Making only the viewer invisible isolated the unmodded player's breath:
+the sample still recorded up to 12 breath particles, with zero synthetic actors.
+See vanilla-server-unmodded-player.png, unmodded-player-breath.json,
+vanilla-server-status.json and vanilla-server-connection.txt.
+
+Development runs also verified suppression with both players invisible,
+in warm plains, with the mouth submerged, and while spectating. Each
+six-second sample recorded zero breath particles after old vapor expired.
+Changing to the warm Nether cleared old particles; returning to the cold
+Overworld resumed emission. These checks preceded the final nearest-emitter
+cleanup adjustment; that adjustment was separately exercised in the packaged
+stress scene, with resource reload and disconnect cleanup repeated afterward.
+
+An unmodded guest joining a modded host's LAN world was attempted but did
+not complete login with the available development identities. It is NOT
+claimed as passed. A Windows Firewall Java permission dialog was left for
+manual handling; no Windows security settings or permissions were changed.
+An authenticated LAN host/guest acceptance test remains necessary.
+
+SHADERS — EXACT CONFIGURATIONS EXERCISED
+Iris 1.11.4 + Sodium 0.9.2, both Minecraft 26.2 builds:
+  1. Shaders disabled: packaged cold-biome rendering and camera/FOV checks.
+  2. Complementary Reimagined r5.9.3, HIGH profile: enabled pipeline,
+     visible first-person and front-third-person vapor in the snowy scene.
+  3. BSL 10.1.8, default pack configuration: enabled pipeline,
+     front-third-person vapor and first-person rendering exercised.
+Pack selection/reloads and camera changes completed without Breath Fog
+exceptions. Actual final screenshots are named packaged-* in evidence.
+Runtime log excerpts identify the exact loaded packs and particle atlas.
+Third-party mods and shader ZIPs are not redistributed in the source bundle.
+
+Lighting and translucency remain controlled by vanilla/Iris/the pack.
+BSL's first-person vapor was particularly subtle against bright snow; that
+snapshot has low contrast and is not presented as proof of strong visibility
+on every background. Raise the first-person strength if desired. Full
+darkness, wall occlusion, pack-option variations, shader resource reloads,
+and the complete pose matrix were not exhaustively checked for both packs.
+No claim is made about every shader pack or every other installed mod.
+
+VISUAL QUALITY AND REMAINING GAMEPLAY CHECKS
+The four original textures have irregular soft transparent edges and varied
+wisps. They were generated for this mod and mechanically resized with alpha
+preserved; full-resolution originals and provenance are in the source ZIP.
+Real screenshots show layered mouth vapor, normal world-space depth behavior,
+and a clear central aiming area in first person. First-person attenuation
+was inspected at three FOVs: at FOV 30, much of the low plume can lie below
+the screen. Direct rear views naturally hide the early plume behind the head;
+movement exposes released trails. It is not drawn through the player.
+
+Standing and camera changes were inspected; live movement occurred in test
+runs and moving actors exercised wakes. A formal end-to-end visual matrix
+of walking, sprinting, sneaking, swimming pose, riding, sleeping and death
+has NOT been completed. Sleeping/death suppression and solid-surface damping
+are implemented, but their full gameplay/visual acceptance remains open.
+Vanilla's 0.1 particle-fragment alpha cutoff limits the faintest dissolve
+tails. Motion uses an analytic curl/wake field, not physical fluid simulation
+or background refraction. Those limits are intentional for this MVP's
+standard, shader-compatible particle rendering path.
+
+PERFORMANCE — TARGET MET IN THIS SCENE
+Hardware/software: Windows 11, Intel Core i5-12500H (16 logical processors),
+NVIDIA RTX 3050 Laptop GPU, NVIDIA driver 546.33, Temurin 25.0.4.1+1.
+1920x1080; render distance 16; simulation distance 12; first person FOV 70;
+Iris/Sodium installed, shaders disabled; VSync off; throttle NONE.
+Seven stationary synthetic remote actors plus the viewer = eight emitters.
+Same fixed camera/position and default intensity for OFF/ON/OFF/ON samples.
+World warmup followed by four approximately 20-second samples. QA status and
+render-event instrumentation were present in both states. Recorded frame
+intervals are a practical scene comparison, not GPU timing or a microbenchmark.
+
+Final packaged build, batch paired-152329:
+State  Frames  Median (ms)  95th percentile (ms)  Peak breath particles
+OFF      6409      2.8939          5.1102                  0
+ON       6394      2.8709          5.1621                 60
+OFF      6585      2.8335          4.9638                  0
+ON       6481      2.8397          5.0551                 60
+
+Paired median changes: -0.0230 ms and +0.0062 ms. These are within ordinary
+measurement variation: no meaningful slowdown was resolved in this scene,
+and both pairs satisfy the <0.5 ms additional-median target. This does not
+guarantee the same result on other hardware, crowded servers, or shaders.
+An earlier valid development batch, paired-145048, measured +0.2638 and
+-0.0183 ms; its evidence is retained separately. Capped/transition samples
+were excluded. See the four final JSON files and benchmark-final-status.json.
+
+FOUNDATION AND RESEARCH
+The source includes common/core, common/config, shared Minecraft client
+integration, and a thin Fabric adapter supplying explicit platform services.
+Architectury is build tooling only; there is no Architectury API runtime mod.
+ARCHITECTURE.md and PORTING.md explain the analysis and port boundaries.
+Minecraft-specific common code still requires adaptation between versions.
+Only Fabric 26.2 is implemented, not placeholder claims of other ports.
+
+Primary sources inspected:
+https://github.com/DerkOttersberg/seamless-crafting/tree/26.2
+https://github.com/DerkOttersberg/seamless-crafting/blob/26.2/PORTING.md
+https://github.com/DerkOttersberg/seamless-crafting/blob/26.2/gradle/libs.versions.toml
+https://fabricmc.net/2026/06/15/262.html
+https://docs.fabricmc.net/develop/rendering/particles/creating-particles
+https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph2007-curlnoise.pdf
+https://github.com/IrisShaders/Iris/blob/26.2/common/src/main/java/net/irisshaders/iris/mixin/MixinParticleEngine.java
+Official Minecraft 26.2 client classes/shader source were also inspected
+locally, and the API assumptions were checked in actual client runs.

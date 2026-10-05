@@ -7,24 +7,7 @@ dependencies {
     implementation project(':common')
 }
 loom { mods { breath_fog { sourceSet sourceSets.main; sourceSet project(':common').sourceSets.main } } }
-// This opt-in development helper is never included in the distributable mod.
-if (project.hasProperty('qa')) {
-    sourceSets.create('qa')
-    configurations {
-        qaImplementation.extendsFrom implementation
-        qaRuntimeOnly.extendsFrom runtimeOnly
-    }
-    sourceSets.qa.compileClasspath += sourceSets.main.compileClasspath + sourceSets.main.output
-    sourceSets.qa.runtimeClasspath += sourceSets.main.runtimeClasspath + sourceSets.main.output
-    loom {
-        mods { breath_fog_qa { sourceSet sourceSets.qa } }
-        runs { client { source sourceSets.qa; runDir 'run-qa'; programArg '--quickPlaySingleplayer'; programArg 'New World' } }
-    }
-    tasks.register('qaHelperJar', Jar) {
-        from sourceSets.qa.output
-        archiveFileName = 'breath-fog-development-qa.jar'
-    }
-}
+apply from: rootProject.file('gradle/qa.gradle')
 processResources {
     inputs.property 'version', project.version
     filesMatching('fabric.mod.json') { expand(version: project.version) }
