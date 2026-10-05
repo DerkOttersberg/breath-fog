@@ -79,7 +79,8 @@ Ubuntu 24.04 WSL, private nonzero Xvfb, WSLg/Wayland targets removed, global
 single-client lock, two client CPUs, low priority, 1 GiB heap and 600-second runtime.
 The private wrapper may queue before that bounded runtime. No Windows game window
 or desktop input is used. Original profiles/worlds and unrelated processes remain
-untouched. Only owned vanilla servers are stopped through their stdin after QA.
+untouched. Only verified owned vanilla servers are stopped after QA, using stdin
+when open or SIGTERM through Minecraft's graceful shutdown hook when input is closed.
 Actual graphics: OpenGL 4.6 Core Profile, llvmpipe LLVM 20.1.2, Mesa
 25.2.8-0ubuntu0.24.04.2. This is software rendering, not hardware acceptance.
 Offline Realms/authentication, missing narrator flite/OpenAL, loader-generated
