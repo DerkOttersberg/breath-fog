@@ -51,10 +51,8 @@ public final class QaClient {
         diagnostic.addProperty("tickCallbacks",ticks);
         diagnostic.addProperty("controllerTicks",BreathFogClient.instance().tickTime());
         diagnostic.addProperty("singletonMatches",client==Minecraft.getInstance());
-        diagnostic.addProperty("screen",client.gui.screen()==null ? "none" : client.gui.screen().getClass().getSimpleName());
+        diagnostic.addProperty("screen",client.screen==null ? "none" : client.screen.getClass().getSimpleName());
         if (client.level!=null) {
-            diagnostic.addProperty("frozen",client.level.tickRateManager().isFrozen());
-            diagnostic.addProperty("rate",client.level.tickRateManager().tickrate());
             diagnostic.addProperty("gameTime",client.level.getGameTime());
         }
         try { Files.writeString(root.resolve("render-status.json"),JSON.toJson(diagnostic)); }
@@ -77,7 +75,7 @@ public final class QaClient {
         try {
             if (ticks==1) {
                 client.options.pauseOnLostFocus=false;
-                client.options.inactivityFpsLimit().set(InactivityFpsLimit.MINIMIZED);
+
                 client.options.renderDistance().set(5);
                 client.options.simulationDistance().set(5);
                 client.options.enableVsync().set(false);
@@ -120,20 +118,22 @@ public final class QaClient {
                 status.addProperty("reloading",resourceReload!=null && !resourceReload.isDone());
                 status.addProperty("particles",BreathFogClient.instance().liveParticles());
                 status.addProperty("peak",peak); status.addProperty("error",lastError);
-                status.addProperty("screen",client.gui.screen()==null ? "none":client.gui.screen().getClass().getSimpleName());
+                status.addProperty("screen",client.screen==null ? "none":client.screen.getClass().getSimpleName());
                 status.addProperty("pixelated",BreathFogClient.instance().settings().pixelated);
                 status.addProperty("capturedShot",capturedShot);
                 status.addProperty("capturedParticles",capturedParticles);
                 status.addProperty("camera",client.options.getCameraType().name());
                 status.addProperty("fov",client.options.fov().get());
-                status.addProperty("throttle",client.getFramerateLimitTracker().getThrottleReason().name());
+                status.addProperty("throttle","legacy");
+                status.addProperty("graphicsRenderer",com.mojang.blaze3d.platform.GlUtil.getRenderer());
+                status.addProperty("graphicsVersion",com.mojang.blaze3d.platform.GlUtil.getOpenGLVersion());
                 var emitters=BreathFogClient.class.getDeclaredField("emitters"); emitters.setAccessible(true);
                 status.addProperty("emitters",((Map<?,?>)emitters.get(BreathFogClient.instance())).size());
                 status.addProperty("actors",actors.size()); status.addProperty("measuring",measurement);
                 if (client.player!=null && client.level!=null) {
                     status.addProperty("gameTime",client.level.getGameTime());
                     status.addProperty("position",client.player.position().toString());
-                    status.addProperty("biome",client.level.getBiome(client.player.blockPosition()).unwrapKey().map(k->k.identifier().toString()).orElse("unknown"));
+                    status.addProperty("biome",client.level.getBiome(client.player.blockPosition()).unwrapKey().map(k->k.location().toString()).orElse("unknown"));
                     status.addProperty("players",client.level.players().size());
                     status.addProperty("name",client.player.getName().getString());
                     status.addProperty("pose",client.player.getPose().name());
@@ -157,7 +157,7 @@ public final class QaClient {
         client.options.pauseOnLostFocus=false;
         client.options.enableVsync().set(false);
         client.options.framerateLimit().set(260);
-        client.options.inactivityFpsLimit().set(InactivityFpsLimit.MINIMIZED);
+
         if (command.has("camera")) client.options.setCameraType(CameraType.valueOf(command.get("camera").getAsString()));
         if (command.has("fov")) client.options.fov().set(command.get("fov").getAsInt());
         if (command.has("enabled")) {
@@ -166,31 +166,45 @@ public final class QaClient {
             BreathFogClient.instance().updateSettings(settings);
         }
         if (command.has("pixelated")) { var settings=BreathFogClient.instance().settings(); settings.pixelated=command.get("pixelated").getAsBoolean(); BreathFogClient.instance().updateSettings(settings); }
-        if (command.has("closeScreen")) client.gui.setScreen(null);
-        if (command.has("config")) client.setScreenAndShow(new BreathFogConfigScreen(client.gui.screen()));
+        if (command.has("closeScreen")) client.setScreen(null);
+        if (command.has("config")) client.setScreen(new BreathFogConfigScreen(client.screen));
         if (command.has("nativeConfig")) {
             if (nativeConfigFactory==null) throw new IllegalStateException("Native config integration is unavailable");
-            client.setScreenAndShow(nativeConfigFactory.apply(client.gui.screen()));
+            client.setScreen(nativeConfigFactory.apply(client.screen));
         }
-        if (command.has("uiText") && client.gui.screen()!=null) {
-            for (var child:client.gui.screen().children()) {
+        if (command.has("uiText") && client.screen!=null) {
+            for (var child:client.screen.children()) {
                 if (child instanceof net.minecraft.client.gui.components.EditBox field) { field.setValue(command.get("uiText").getAsString()); break; }
             }
         }
-        if (command.has("guiScale")) { client.options.guiScale().set(command.get("guiScale").getAsInt()); client.resizeGui(); }
-        if (command.has("uiClick") && client.gui.screen()!=null) {
+        if (command.has("guiScale")) { client.options.guiScale().set(command.get("guiScale").getAsInt()); client.resizeDisplay(); }
+        if (command.has("uiToggle") && client.screen instanceof SettingsScreen screen) {
+            var field=SettingsScreen.class.getDeclaredField("rows"); field.setAccessible(true);
+            String label=command.get("uiToggle").getAsString(); boolean found=false;
+            for (Object row:(List<?>)field.get(screen)) {
+                var labelMethod=row.getClass().getDeclaredMethod("label"); labelMethod.setAccessible(true);
+                var widgetMethod=row.getClass().getDeclaredMethod("widget"); widgetMethod.setAccessible(true);
+                if (labelMethod.invoke(row).equals(label)) {
+                    var button=(net.minecraft.client.gui.components.Button)widgetMethod.invoke(row);
+                    if (!screen.children().contains(button)) throw new IllegalStateException("Toggle is not on the visible page");
+                    button.onPress(); found=true; break;
+                }
+            }
+            if (!found) throw new IllegalStateException("Setting not found: "+label);
+        }
+        if (command.has("uiClick") && client.screen!=null) {
             String label=command.get("uiClick").getAsString();
             boolean found=false;
-            for (var child:client.gui.screen().children()) {
+            for (var child:client.screen.children()) {
                 if (child instanceof net.minecraft.client.gui.components.Button button && button.getMessage().getString().equals(label)) {
-                    button.onPress(new net.minecraft.client.input.MouseButtonInfo(0,0)); found=true; break;
+                    button.onPress(); found=true; break;
                 }
             }
             if (!found) throw new IllegalStateException("UI button not found: "+label);
         }
         if (command.has("clientCommand") && client.player!=null) {
             client.player.connection.sendCommand(command.get("clientCommand").getAsString());
-            client.gui.setScreen(null); // Mirror vanilla chat's close-on-submit after dispatch.
+            client.setScreen(null); // Mirror vanilla chat's close-on-submit after dispatch.
         }
         if (command.has("preview")) BreathFogClient.instance().preview();
         if (command.has("cancelPreview")) {
@@ -224,20 +238,25 @@ public final class QaClient {
             for (int i=0;i<count;i++) {
                 var actor=new RemotePlayer(client.level,new GameProfile(UUID.nameUUIDFromBytes(("breath-fog-qa-"+i).getBytes()),"QA"+i));
                 actor.setId(100000+i); actor.setPos(client.player.getX()+(i%4-1.5)*1.8,client.player.getY(),client.player.getZ()+4+(i/4)*2);
-                actor.setYRot(180); actor.setYHeadRot(180); client.level.addEntity(actor); actors.add(actor);
+                actor.setYRot(180); actor.setYHeadRot(180); client.level.putNonPlayerEntity(actor.getId(),actor); actors.add(actor);
             }
         }
         if (command.has("motion")) actorMotion=command.get("motion").getAsDouble();
+        if (command.has("resourcePack")) {
+            String pack=command.get("resourcePack").getAsString();
+            var repository=client.getResourcePackRepository(); repository.reload();
+            repository.setSelected(pack.isEmpty() ? List.of() : List.of(pack));
+        }
         if (command.has("reload")) resourceReload=client.reloadResourcePacks();
         if (command.has("connect")) {
-            client.disconnectWithSavingScreen();
+            client.clearLevel(new net.minecraft.client.gui.screens.TitleScreen());
             String address=command.get("connect").getAsString();
             net.minecraft.client.gui.screens.ConnectScreen.startConnecting(new net.minecraft.client.gui.screens.TitleScreen(),client,
                 net.minecraft.client.multiplayer.resolver.ServerAddress.parseString(address),
-                new net.minecraft.client.multiplayer.ServerData("QA",address,net.minecraft.client.multiplayer.ServerData.Type.OTHER),false,null);
+                new net.minecraft.client.multiplayer.ServerData("QA",address,false),false);
             actors.clear();
         }
-        if (command.has("disconnect")) { client.disconnectWithSavingScreen(); actors.clear(); }
+        if (command.has("disconnect")) { client.clearLevel(new net.minecraft.client.gui.screens.TitleScreen()); actors.clear(); }
         if (command.has("shader")) {
             Class<?> iris=Class.forName("net.irisshaders.iris.Iris");
             Object cfg=iris.getMethod("getIrisConfig").invoke(null);
@@ -269,10 +288,9 @@ public final class QaClient {
             capturedShot=shot;
             capturedParticles=BreathFogClient.instance().liveParticles();
             Path file=root.resolve(shot+".png"); shot=null;
-            Screenshot.takeScreenshot(client.gameRenderer.mainRenderTarget(),image -> {
-                try { image.writeToFile(file); } catch (Exception e) { e.printStackTrace(); } finally { image.close(); }
-            });
+            try (var image=Screenshot.takeScreenshot(client.getMainRenderTarget())) {
+                image.writeToFile(file);
+            } catch (Exception e) { throw new IllegalStateException(e); }
         }
     }
 }
-

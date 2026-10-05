@@ -1,1 +1,1 @@
-{"schemaVersion":1,"id":"breath_fog_qa","version":"1.0.0","name":"Breath Fog QA (never distribute)","environment":"client","entrypoints":{"client":["io.github.derkottersberg.breathfog.qa.FabricQa"]},"depends":{"breath_fog":"*","minecraft":"26.3","fabric-api":"*"}}
+{"schemaVersion":1,"id":"breath_fog_qa","version":"1.0.0","name":"Breath Fog QA (never distribute)","environment":"client","entrypoints":{"client":["io.github.derkottersberg.breathfog.qa.FabricQa"]},"depends":{"breath_fog":"*","minecraft":"1.20.1","fabric-api":"*"}}

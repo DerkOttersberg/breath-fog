@@ -3,13 +3,15 @@ package io.github.derkottersberg.breathfog.client;
 import io.github.derkottersberg.breathfog.core.CameraComfort;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.SingleQuadParticle;
-import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.ParticleRenderType;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.world.phys.Vec3;
 
 /** Standard lit translucent vanilla quad. Rendering remains entirely inside the vanilla particle path. */
-public final class BreathParticle extends SingleQuadParticle {
+public final class BreathParticle extends TextureSheetParticle {
     private final BreathFogClient controller;
     private final boolean ownPlayer;
     private final boolean pixelated;
@@ -18,7 +20,8 @@ public final class BreathParticle extends SingleQuadParticle {
     private double collisionFade=1;
     public BreathParticle(ClientLevel level, Vec3 origin, Vec3 velocity, TextureAtlasSprite sprite,
                           boolean ownPlayer, double cold, BreathFogClient controller) {
-        super(level,origin.x,origin.y,origin.z,sprite);
+        super(level,origin.x,origin.y,origin.z);
+        setSprite(sprite);
         this.controller=controller; this.ownPlayer=ownPlayer; this.cold=cold;
         this.pixelated=controller.currentSettings().pixelated;
         this.xd=velocity.x; this.yd=velocity.y; this.zd=velocity.z;
@@ -33,7 +36,7 @@ public final class BreathParticle extends SingleQuadParticle {
         this.rCol=0.96f; this.gCol=0.975f; this.bCol=0.98f;
         this.alpha=0;
     }
-    @Override protected Layer getLayer() { return Layer.TRANSLUCENT; }
+    @Override public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
     @Override public void tick() {
         xo=x; yo=y; zo=z; oRoll=roll;
         if (++age>=lifetime || !controller.currentSettings().enabled) { remove(); return; }
@@ -55,21 +58,21 @@ public final class BreathParticle extends SingleQuadParticle {
         if (pixelated) growth=Math.floor(growth*8)/8;
         return (float)(startSize+(endSize-startSize)*growth);
     }
-    @Override public void extract(QuadParticleRenderState state, Camera camera, float partialTick) {
+    @Override public void render(VertexConsumer state, Camera camera, float partialTick) {
         var config=controller.currentSettings();
         boolean first=ownPlayer && !camera.isDetached();
         if (!config.enabled || (ownPlayer && !(first ? config.firstPerson : config.thirdPerson)) || (!ownPlayer && !config.nearbyPlayers)) return;
-        double px=xo+(x-xo)*partialTick-camera.position().x;
-        double py=yo+(y-yo)*partialTick-camera.position().y;
-        double pz=zo+(z-zo)*partialTick-camera.position().z;
+        double px=xo+(x-xo)*partialTick-camera.getPosition().x;
+        double py=yo+(y-yo)*partialTick-camera.getPosition().y;
+        double pz=zo+(z-zo)*partialTick-camera.getPosition().z;
         double distance=Math.sqrt(px*px+py*py+pz*pz);
-        var forward=camera.forwardVector();
+        var forward=camera.getLookVector();
         double cosine=distance>1e-6 ? (px*forward.x()+py*forward.y()+pz*forward.z())/distance : 1;
         double comfort=CameraComfort.attenuation(distance,cosine,first);
         double envelope=CameraComfort.envelope((age+partialTick)/lifetime);
         // Vanilla's particle shader discards fragments below 0.1 alpha. The lower first-person
         // origin and viewing cone keep this readable density out of the central aiming area.
         alpha=(float)Math.min(0.45, (0.22+0.32*cold)*config.intensity*envelope*comfort*collisionFade*(first ? config.firstPersonIntensity : 1));
-        if (alpha>0.001f) super.extract(state,camera,partialTick);
+        if (alpha>0.001f) super.render(state,camera,partialTick);
     }
 }

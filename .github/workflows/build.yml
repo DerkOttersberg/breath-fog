@@ -16,7 +16,7 @@ jobs:
           java-version: '25'
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew
-      - run: ./gradlew clean check build --console=plain
+      - run: ./gradlew --no-build-cache clean check build --console=plain
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -24,8 +24,9 @@ jobs:
           path: common/build/reports/tests
       - uses: actions/upload-artifact@v4
         with:
-          name: breath-fog-mc26.3
+          name: breath-fog-mc1.20.1
           path: |
-            fabric/build/libs/*-fabric*.jar
-            forge/build/libs/*-forge*.jar
-            neoforge/build/libs/*-neoforge*.jar
+            fabric/build/libs/*-fabric.jar
+            fabric/build/libs/*-fabric-sources.jar
+            forge/build/libs/*-forge.jar
+            forge/build/libs/*-forge-sources.jar

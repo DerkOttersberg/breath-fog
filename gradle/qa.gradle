@@ -11,7 +11,16 @@ if (project.hasProperty('qa')) {
     }
     tasks.register('qaHelperJar', Jar) {
         from sourceSets.qa.output
+        archiveFileName = "breath-fog-qa-${project.name}-dev.jar"
+
+    }
+}
+
+if (project.hasProperty('qa')) {
+    tasks.register('remapQaHelperJar', tasks.named('remapJar').get().getClass().superclass) {
+        dependsOn tasks.named('qaHelperJar')
+        inputFile = tasks.named('qaHelperJar', Jar).flatMap { it.archiveFile }
         archiveFileName = "breath-fog-qa-${project.name}.jar"
-        if (project.name == 'forge') manifest { attributes 'MixinConfigs': 'breathfog-qa.mixins.json' }
+        classpath.from(sourceSets.qa.compileClasspath)
     }
 }

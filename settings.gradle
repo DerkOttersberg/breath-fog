@@ -9,6 +9,6 @@ pluginManagement {
 plugins { id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0' }
 rootProject.name = 'breath-fog'
 gradle.beforeProject { project ->
-    project.ext.set('loom.platform', project.name in ['forge', 'neoforge'] ? project.name : 'fabric')
+    project.ext.set('loom.platform', project.name in ['forge'] ? project.name : 'fabric')
 }
-include 'common', 'fabric', 'forge', 'neoforge'
+include 'common', 'fabric', 'forge'

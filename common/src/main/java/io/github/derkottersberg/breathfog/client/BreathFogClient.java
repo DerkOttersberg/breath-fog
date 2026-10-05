@@ -23,15 +23,15 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.AtlasIds;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
 
 /** Shared client orchestration. Reads existing world state; never sends packets or mutates entities. */
 public final class BreathFogClient {
-    private static final TagKey<Biome> COLD = TagKey.create(Registries.BIOME, Identifier.parse("c:is_cold"));
+    private static final TagKey<Biome> COLD = TagKey.create(Registries.BIOME, new ResourceLocation("c:is_cold"));
     private static final BreathFogClient INSTANCE = new BreathFogClient();
     private final Map<UUID, Emitter> emitters = new HashMap<>();
     private final ArrayList<AbstractClientPlayer> candidates = new ArrayList<>(24);
@@ -97,7 +97,7 @@ public final class BreathFogClient {
     public void tick(Minecraft client) {
         if (settingsScreenRequested) {
             settingsScreenRequested=false;
-            client.setScreenAndShow(new BreathFogConfigScreen(null));
+            client.setScreen(new BreathFogConfigScreen(null));
         }
         if (client.level != level) { clear(); level = client.level; }
         if (level == null || client.player == null) return;
@@ -108,7 +108,7 @@ public final class BreathFogClient {
         if (gameTick==processedGameTick) return;
         processedGameTick=gameTick;
         tick++;
-        TextureAtlas atlas=client.getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES);
+        TextureAtlas atlas=(TextureAtlas) client.getTextureManager().getTexture(TextureAtlas.LOCATION_PARTICLES);
         if (reloadPending || spriteAtlas != atlas || (sprites[0] != null &&
                 sprites[0] != atlas.getSprite(BreathFog.id("particle/"+(settings.pixelated ? "pixel_wisp_0" : "wisp_0"))))) {
             clearParticles();
@@ -129,7 +129,7 @@ public final class BreathFogClient {
             while (insertion<candidates.size() && candidates.get(insertion).distanceToSqr(client.player)<=distance) insertion++;
             if (insertion>=FogBudget.EMITTER_CAP) continue;
             candidates.add(insertion, player);
-            if (candidates.size()>FogBudget.EMITTER_CAP) candidates.removeLast();
+            if (candidates.size()>FogBudget.EMITTER_CAP) candidates.remove(candidates.size()-1);
         }
         selectedIds.clear();
         for (AbstractClientPlayer player : candidates) selectedIds.add(player.getUUID());
@@ -175,10 +175,10 @@ public final class BreathFogClient {
     private void emit(Minecraft client, AbstractClientPlayer player, Emitter emitter, double cold, boolean own, int exhale) {
         if (spritesMissing) return;
         if (sprites[0]==null) {
-            TextureAtlas atlas=client.getAtlasManager().getAtlasOrThrow(AtlasIds.PARTICLES);
+            TextureAtlas atlas=(TextureAtlas) client.getTextureManager().getTexture(TextureAtlas.LOCATION_PARTICLES);
             for (int i=0; i<sprites.length; i++) {
                 sprites[i]=atlas.getSprite(BreathFog.id("particle/"+(settings.pixelated ? "pixel_wisp_" : "wisp_")+i));
-                if (sprites[i]==atlas.missingSprite()) {
+                if (sprites[i]==atlas.getSprite(MissingTextureAtlasSprite.getLocation())) {
                     LogUtils.getLogger().warn("Breath Fog vapor sprites are missing; emission is suspended until resource reload.");
                     spritesMissing=true;
                     return;
@@ -190,7 +190,7 @@ public final class BreathFogClient {
         Vec3 eye=player.getEyePosition();
         Vec3 mouth=eye.add(direction.scale(first ? 0.34 : 0.22));
         if (first) {
-            var up=client.gameRenderer.mainCamera().upVector();
+            var up=client.gameRenderer.getMainCamera().getUpVector();
             mouth=mouth.add(-up.x()*0.20, -up.y()*0.20, -up.z()*0.20);
         } else mouth=mouth.add(0,-0.13,0);
         if (!level.getFluidState(BlockPos.containing(mouth)).isEmpty()) return;

@@ -1,30 +1,16 @@
-BREATH FOG 1.0.0 â€” MINECRAFT 26.3 / JAVA 25
+BREATH FOG — MINECRAFT 1.20.1
 
-Install the runtime JAR matching your loader in your profile's mods folder.
-Fabric: Loader 0.19.5 + Fabric API 0.161.0+26.3.
-Forge: 66.0.9. NeoForge: 26.3.0.48-beta. No extra runtime mod is required.
-Do not install sources or QA helper JARs as gameplay mods.
+Install the runtime JAR matching Minecraft 1.20.1 and your loader.
+Use Java 17. Fabric requires Fabric API 0.92.12+1.20.1; Forge requires 47.4.26 or
+a compatible later build in the same major line.
 
-Visit a cold biome, or run /breathfog preview for a 20-second preview.
-Try first person and both third-person views using F5.
-Open /breathfog config, optional Mod Menu (Fabric),
-or Forge/NeoForge's Mods config button.
+Open /breathfog config, optional Mod Menu 7.2.2 on Fabric,
+or the loader's Mods config button. Appearance > Pixelated Minecraft style
+switches to 16x16 sprites. Select Save to apply; Cancel discards your draft.
+/breathfog preview displays a 20-second preview in any biome.
+Settings are in config/breath_fog.json. Only the viewer installs this mod.
+Servers need no mod or loader. Cold biomes produce normal breath; sleeping,
+death, invisibility, spectator mode and underwater suppress it.
 
-On the Appearance page, enable Pixelated Minecraft style and select Save.
-Disable that option for soft vapor. Cancel discards changes; Reset defaults
-changes your draft. Preview uses saved settings. Settings survive restarts
-in config/breath_fog.json. Existing files default to the soft style.
-
-Only the viewing client needs this mod. Servers and nearby players need
-no installation. The mod changes no gameplay and sends no packets.
-Dead, sleeping, spectating, invisible and submerged players do not emit.
-Cold detection uses biome temperature below 0.5 or c:is_cold, including
-indoors. Vanilla's Minimal particle setting reduces the effect.
-
-If vapor is too subtle, raise Vapor intensity or First-person strength.
-The central aiming area is intentionally attenuated. All required sprites
-and the icon are bundled; no extra resource pack is needed.
-
-Build with Java 25 using ./gradlew clean check build (gradlew.bat on Windows).
-README.md lists installations, TESTING.txt records the exact acceptance
-matrix and limits, and PORTING.md explains the multi-loader implementation.
+Source: https://github.com/DerkOttersberg/breath-fog/tree/1.20.1
+See TESTING.txt for exact packaged-client checks and limits. CC0-1.0.

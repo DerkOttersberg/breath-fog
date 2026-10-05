@@ -1,8 +1,9 @@
-plugins { id 'dev.architectury.loom-no-remap' }
+plugins { id 'dev.architectury.loom' }
 dependencies {
     minecraft libs.minecraft
+    mappings loom.officialMojangMappings()
     // Annotation definitions present on Loom's merged Minecraft jar; no loader code is used by common.
-    compileOnly libs.fabric.loader
+    modCompileOnly libs.fabric.loader
     testImplementation platform(libs.junit.bom)
     testImplementation libs.junit.jupiter
     testImplementation libs.gson
