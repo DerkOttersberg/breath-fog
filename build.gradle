@@ -57,6 +57,12 @@ tasks.register('verifyLoaderJar') {
                     'assets/minecraft/atlases/particles.json', 'assets/breath_fog/icon.png']
                 (0..3).each { i -> ['wisp_', 'pixel_wisp_'].each { required << "assets/breath_fog/textures/particle/${it}${i}.png" } }
                 required.each { if (zip.getEntry(it) == null) throw new GradleException("${loader}: missing ${it}") }
+                def iconEntry = zip.getEntry('assets/breath_fog/icon.png')
+                def iconImage = javax.imageio.ImageIO.read(zip.getInputStream(iconEntry))
+                if (iconImage == null || iconImage.width != 400 || iconImage.height != 400) throw new GradleException('Incorrect owner-supplied icon dimensions')
+                def packagedIcon = zip.getInputStream(iconEntry).bytes
+                def sourceIcon = rootProject.file('common/src/main/resources/assets/breath_fog/icon.png').bytes
+                if (!java.util.Arrays.equals(packagedIcon, sourceIcon)) throw new GradleException('Packaged icon differs from the supplied PNG')
                 def entries = zip.entries().toList()*.name
                 def foreign = ['fabric.mod.json','META-INF/mods.toml','META-INF/neoforge.mods.toml'] - metadataPath
                 if (entries.any { it.contains('/qa/') || it.contains('/gametest/') || it.startsWith('net/minecraft/') || it.startsWith('net/fabricmc/') || it.startsWith('com/derko/seamlessapi/') || it.startsWith('assets/minecraft/shaders/') } || foreign.any { it in entries })

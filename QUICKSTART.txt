@@ -1,4 +1,4 @@
-BREATH FOG — MINECRAFT 1.20.1
+BREATH FOG â€” MINECRAFT 1.20.1
 
 Install the runtime JAR matching Minecraft 1.20.1 and your loader.
 Use Java 17. Fabric requires Fabric API 0.92.12+1.20.1; Forge requires 47.4.26 or
@@ -14,3 +14,6 @@ death, invisibility, spectator mode and underwater suppress it.
 
 Source: https://github.com/DerkOttersberg/breath-fog/tree/1.20.1
 See TESTING.txt for exact packaged-client checks and limits. CC0-1.0.
+
+Pixelated breath is the default in new configs and after Reset defaults.
+Explicitly saved soft-style choices remain unchanged.
