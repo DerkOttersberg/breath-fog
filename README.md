@@ -1,5 +1,7 @@
 # Breath Fog
 
+<img src="docs/images/breath-fog-icon.png" alt="Breath Fog" width="128">
+
 Client-only cold-biome breath vapor, with soft and pixelated styles on the maintained Minecraft version branches below. Each branch contains its supported loaders, source, build instructions, screenshots and acceptance report.
 
 ## Minecraft version branches
@@ -11,11 +13,17 @@ Client-only cold-biome breath vapor, with soft and pixelated styles on the maint
 | 1.20.1 | Fabric, Forge | [1.20.1](https://github.com/DerkOttersberg/breath-fog/tree/1.20.1) |
 | 26.2 | Historical Fabric MVP | [26.2](https://github.com/DerkOttersberg/breath-fog/tree/26.2) |
 
-The maintained branches include soft vapor and a saved **Pixelated Minecraft style** toggle. Each Minecraft version keeps its supported loaders together. Use its own installation instructions, dependency pins, and TESTING.txt; binaries are specific to that version. Quilt is outside the maintained support matrix.
+The maintained branches default to pixelated breath in fresh configs and include a saved **Pixelated Minecraft style** toggle for choosing soft vapor. Existing explicit style choices are preserved. Each Minecraft version keeps its supported loaders together. Use its own installation instructions, dependency pins, and TESTING.txt; binaries are specific to that version. Quilt is outside the maintained support matrix.
 
 This default branch preserves the original 26.2 Fabric MVP and its historical evidence. Open a maintained version branch above for the completed multi-loader implementation and pixel option.
 
-## Install
+## Install a maintained version
+
+Open the matching version branch above and follow its installation/build instructions. Current artifacts use `breath-fog-1.0.1+mc<version>-<loader>.jar`; install one matching runtime JAR and its declared dependencies. Each maintained branch records the tested loader pins, pixelated default, icon and exact acceptance evidence.
+
+The existing GitHub release below belongs to the historical 26.2 MVP.
+
+## Historical 26.2 install
 
 Download the installable JAR from [Releases](https://github.com/DerkOttersberg/breath-fog/releases). This is an MVP test build: [TESTING.txt](TESTING.txt) records the completed checks and remaining acceptance work.
 
