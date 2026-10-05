@@ -5,7 +5,7 @@
   "name": "Breath Fog",
   "description": "Airy, responsive breath vapor in cold biomes. Subtle in first person, atmospheric in third person, entirely client-side.",
   "authors": ["Derk Ottersberg"],
-  "license": "CC0-1.0",
+  "license": "All Rights Reserved",
   "environment": "client",
   "entrypoints": {
     "client": ["io.github.derkottersberg.breathfog.fabric.BreathFogFabricClient"],
