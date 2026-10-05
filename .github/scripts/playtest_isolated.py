@@ -72,12 +72,15 @@ process = subprocess.Popen(['bash', wrapper] + cmd, cwd=client, stdout=log, stde
 qa = client / 'qa'
 counter = 0
 results = []
+last_complete_status = {}
 
 def state():
+    global last_complete_status
     try:
-        return json.loads((qa / 'status.json').read_text())
+        last_complete_status = json.loads((qa / 'status.json').read_text())
     except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+        pass
+    return last_complete_status
 
 def until(predicate, seconds=90):
     end = time.monotonic() + seconds
