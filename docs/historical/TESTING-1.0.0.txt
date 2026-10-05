@@ -1,0 +1,133 @@
+BREATH FOG 1.0.0+mc26.3 — ACTUAL ACCEPTANCE REPORT
+Minecraft Java 26.3. Test date: 5 October 2026.
+
+SOURCE AND ARTIFACTS
+Cloned https://github.com/DerkOttersberg/breath-fog at
+4223c7380d6bddbe64ca6887dc340df26532816c (26.2 foundation).
+Implemented the port on local branch 26.3. CC0-1.0 identity is preserved.
+Production source: 637e2e9b4b9210346357f7a0b1d3a8d61366b7ac (26.3).
+Subsequent documentation/QA driver changes do not change runtime bytes.
+.github/acceptance/acceptance.json records source inputs and exact installed hashes.
+Local acceptance is separate from hosted CI.
+
+Runtime JAR SHA-256:
+Fabric: a759618dfa7932fda9e6ffdd4e5db4113ce7269e13bb50f9f6a66ae7472f6504
+Forge:         7ba7e0700f14a49fef9c045a06219beec3f9e79f15a16fd6d959bfaef82d45b9
+NeoForge:      83bb8e10d2a5a6c77075007fc16b5eb8b4c88114e1c72b26d1dc12f56dccb8b8
+
+Runtime/source JARs, a full source ZIP, SHA256SUMS.txt, and this report are in
+C:/Users/derko/Desktop/minecraft/release-candidates/breath-fog/mc26.3.
+Lightweight evidence is in
+C:/Users/derko/Desktop/minecraft/qa-artifacts/breath-fog-mc26.3.
+The full owned Linux stage is /root/breath-fog-26.3-20261005.
+Development helpers, game libraries, profiles and worlds are not releases.
+
+BUILD — PASSED
+OpenJDK 25.0.4.1+1-1-24.04.4-Ubuntu, Gradle 9.5.1,
+Architectury plugin 3.5.169 / Loom-no-remap 1.17.493.
+Final clean check build: build-final8.log, exit 0; 39 tasks executed.
+11 JUnit tests, no skips, failures or errors (4 settings + 7 policy tests).
+Development-only helper code is excluded from runtime JARs.
+
+Checks validate all three runtime JARs, matching loader metadata, client
+scope, Minecraft 26.3 / Java 25, common implementation, CC0 license, icon,
+four soft 128x128 and four pixel 16x16 RGBA sprites, transparent borders,
+and exactly eight additive namespaced atlas sources. QA helpers, game and
+loader classes, foreign metadata, and vanilla shader replacements are rejected.
+Forge's two compatibility hooks and explicit Mixin 0.8.7 baseline are required.
+All class files have major version 69. Common has no loader imports; portable
+core has no Minecraft imports. Runtime Architectury or SeamlessLib is not required.
+
+Tests cover cold eligibility/exposure, independent idle/sprint cadence,
+suppression without queued bursts, emission allocation and budgets, camera
+fade, curl/wakes, backward-compatible config defaults, pixel persistence,
+partial configs, numeric validation, and byte-preserving invalid-file backups.
+GitHub CI is configured to build/check/upload Fabric, Forge and NeoForge artifacts;
+local acceptance is separate from a hosted CI run.
+
+PACKAGED CLIENT MATRIX
+Fabric 0.19.5 + Fabric API 0.161.0+26.3: fabric-2, 28 checks, PASSED.
+Forge 26.3-66.0.9: forge-18, 30 checks, PASSED.
+NeoForge 26.3.0.48-beta: neoforge-3, 24 checks, PASSED.
+Fabric combined: fabric-combined-1, 30 checks, PASSED; Mod Menu 21.0.0 present.
+Forge combined: forge-combined-4, 31 checks, PASSED.
+NeoForge combined: neoforge-combined-2, 29 checks, PASSED (integrated world).
+
+The final runtime JAR is installed normally in each fresh profile. Launch
+classpath uses the official client and production loader installation;
+project classes/resources and common development JARs are absent.
+Separate QA helper JARs drive internal game controls and record status,
+actual screenshot captures, installed hashes and a PASS marker after exit 0.
+Forge/NeoForge's native registered config factories are exercised directly;
+Fabric's actual Mod Menu factory is exercised when Mod Menu is installed.
+The final hash must match each profile before accepting its results.
+
+FEATURE CHECKS
+Both saved styles render; first person and both third-person cameras work.
+Actual settings buttons exercise pixel toggle, Cancel, Save, invalid NaN
+rejection, pagination and draft-preserving GUI resizing; scales 2 and 3 are
+captured. Combined profiles start a new client process with a saved pixel
+config and verify it loaded before changing it for the test.
+Local /breathfog config opens through the real client send path.
+The mod cleans owned particles when disabled, on style change, disconnect,
+and resource reload. The current harness waits for the reload future and
+for Minecraft to resume before testing subsequent emission.
+
+Actual in-game scenarios exercise sprinting, sneaking, riding a boat,
+sleeping, underwater, invisibility, spectator mode, death and respawn.
+Sleeping/death/spectator/invisible/submerged players stop emitting; respawn
+restores breath. Warm plains suppress normal breath; saved-setting preview
+renders there. Preview continues to respect visibility/suppression rules.
+With 48 synthetic remote actors, the controller selects 24 nearest emitters
+and stays below its 256-particle cap. This is a budget/motion check, not a
+GPU benchmark or evidence of 48 actual multiplayer connections.
+
+An entirely unmodded dedicated vanilla 26.3 server is launched on loopback
+with copied, previously accepted QA EULA and offline development identities.
+Every standalone loader profile joins it and emits breath in its snowy biome; server
+installation of Breath Fog or loader libraries is unnecessary. This proves
+that connection case, not authenticated LAN or a second actual guest client.
+Disconnect leaves no owned particles. The owned server is stopped after QA.
+The NeoForge companion suite rejects vanilla-server login because its other
+mods require NeoForge payload support. Its combined acceptance uses a modded
+integrated-server world; the independent Breath Fog NeoForge profile passes
+vanilla login. That expected suite constraint is retained in the failed attempt.
+
+ISOLATION AND DRIVER
+Ubuntu 24.04 in WSL, private nonzero Xvfb display, WSLg/Wayland targets
+removed, shared single-client lock, software renderer, nice priority 10,
+2 client CPUs, 1 GiB maximum heap, 600-second client timeout.
+No Windows Minecraft window or desktop input was used. Original profiles,
+worlds, security settings and unrelated Java processes were not changed.
+The owned wrapper copy may queue on the shared lock before its bounded run.
+
+Actual graphics backend in passing logs: Vulkan 1.4.318, llvmpipe
+Mesa 25.2.8-0ubuntu0.24.04.2, LLVM 20.1.2. This is SOFTWARE Vulkan,
+not a hardware GPU acceptance result. The isolated OpenGL route could not
+create the required GLX visual; some Forge runs logged an OpenGL failure
+before successful software Vulkan initialization.
+
+LOG REVIEW AND FAILED ATTEMPTS
+Offline placeholder identities produce user-properties/Realms authentication
+diagnostics. WSL lacks the narrator flite library and an OpenAL device;
+Minecraft disables those services. These messages are distinct from a mod
+exception. Passing final profiles have no Breath Fog stack traces.
+
+Earlier Forge runs exposed legacy tick/command events missing the new
+in-world loop. Forge-only lifecycle and command mixins now bridge them;
+the shared controller processes each game-time value once to avoid duplicate
+ticks. Forge also hooks each simulation tick so low render FPS cannot slow
+the breath clock; a forced 10 FPS run verifies controller/game-time cadence.
+A missing Mixin minVersion declaration was corrected and retested.
+QA bootstrap, reentrancy, reload timing and shared-lock failures are retained;
+they do not become PASS markers. Failed profiles/logs are not deleted.
+
+LIMITS
+No 26.3 hardware OpenGL/GPU performance benchmark, shader-pack matrix,
+authenticated LAN, second actual guest, or exhaustive other-mod/resource-pack
+matrix is claimed. Current tests verify standard lit/depth-tested particles;
+they do not guarantee every shader pack's brightness or translucency ordering.
+The 26.2 shader, multiplayer and hardware results remain historical in
+docs/historical/TESTING-26.2.txt and the original evidence directory.
+Server gameplay GameTests do not exercise this client-only visual feature;
+actual isolated client/world scenarios provide the relevant runtime gate.

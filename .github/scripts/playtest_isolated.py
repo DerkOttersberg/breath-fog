@@ -118,7 +118,11 @@ try:
     if saved_config:
         assert state()['pixelated'], 'Saved pixel style did not survive a fresh client process'
         record('restart-preserves-pixel-setting', state())
-        send(pixelated=False)
+    else:
+        assert state()['pixelated'], 'Fresh installation did not select pixelated breath'
+        assert json.loads((client/'config/breath_fog.json').read_text())['pixelated']
+        record('fresh-default-is-pixelated', state())
+    send(pixelated=False)
     send(closeScreen=True, enabled=True, commands=['difficulty peaceful','gamemode creative BreathQA','tp BreathQA 0 200 0','fill -8 199 -8 8 199 8 minecraft:gray_concrete','time set day','weather clear'])
     time.sleep(3)
     send(commands=['fillbiome -12 196 -12 12 220 12 minecraft:snowy_plains'], yaw=180)
@@ -140,6 +144,16 @@ try:
     send(uiClick='Cancel')
     assert not state()['pixelated'], 'Cancel applied draft'
     record('cancel-preserves-soft', state())
+    send(config=True)
+    send(uiClick='Reset defaults')
+    send(uiClick='Save')
+    assert state()['pixelated'], 'Reset defaults did not select pixelated breath'
+    assert json.loads((client/'config/breath_fog.json').read_text())['pixelated']
+    record('reset-default-is-pixelated', state())
+    send(config=True)
+    send(uiClick='>')
+    shot('settings-pixel-default')
+    send(closeScreen=True, pixelated=False)
     send(config=True)
     send(uiClick='>')
     send(uiText='NaN')

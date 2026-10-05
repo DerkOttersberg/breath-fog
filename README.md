@@ -1,6 +1,6 @@
 # Breath Fog
 
-Client-only breath vapor for **Minecraft Java 26.3**, supporting **Fabric, Forge, and NeoForge**. Cold air becomes visible for you and nearby players as layered exhalations. Choose soft vapor or a pixelated Minecraft style in the settings.
+Client-only breath vapor for **Minecraft Java 26.3**, supporting **Fabric, Forge, and NeoForge**. Cold air becomes visible for you and nearby players as layered exhalations. Pixelated Minecraft-style vapor is the default; choose soft vapor in the settings if preferred.
 
 ## Minecraft version branches
 
@@ -23,7 +23,7 @@ Use Java 25 and the JAR matching your loader:
 | Forge | 66.0.9 | None |
 | NeoForge | 26.3.0.48-beta | None |
 
-Install one `breath-fog-1.0.0+mc26.3-<loader>.jar` in your profile's `mods` folder. The listed NeoForge loader is a beta build. The older Fabric 26.2 source remains on branch `26.2`.
+Install one `breath-fog-1.0.1+mc26.3-<loader>.jar` in your profile's `mods` folder. The listed NeoForge loader is a beta build. The older Fabric 26.2 source remains on branch `26.2`.
 
 Only the viewer needs the mod. Servers and other players need no installation. It sends no packets, registers no particle types, changes no gameplay, and stores no world data. Breath timing is independently simulated by each viewer.
 
@@ -36,7 +36,7 @@ Open `/breathfog config`, Mod Menu on Fabric (optional), or Forge/NeoForge's Mod
 - Vapor intensity: 0.10–2.00. First-person strength: 0.10–1.50.
 - Save applies your draft; Cancel discards it; Reset defaults changes the draft. Drafts survive pagination and resizing. Preview uses your saved settings.
 
-Settings are local to your client, in `config/breath_fog.json`. Existing configs retain their values and default to soft vapor. Invalid configs remain intact during recovery; a subsequent Save first preserves their original bytes in a uniquely named `.json.bak` file. Writes are atomic when supported by the filesystem.
+Settings are local to your client, in `config/breath_fog.json`. Fresh configs and configs without a style selection default to pixelated vapor. Existing saved style choices retain their values. Invalid configs remain intact during recovery; a subsequent Save first preserves their original bytes in a uniquely named `.json.bak` file. Writes are atomic when supported by the filesystem.
 
 Actual 26.3 screenshots: [soft vapor](docs/images/26.3/soft-first.png), [pixelated vapor](docs/images/26.3/pixel-first.png), and [Appearance settings](docs/images/26.3/settings-pixel-toggle.png).
 

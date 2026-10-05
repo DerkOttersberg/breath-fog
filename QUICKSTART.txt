@@ -10,10 +10,10 @@ Try first person and both third-person views using F5.
 Open /breathfog config, optional Mod Menu (Fabric),
 or Forge/NeoForge's Mods config button.
 
-On the Appearance page, enable Pixelated Minecraft style and select Save.
+On the Appearance page, Pixelated Minecraft style is enabled by default. Change it and select Save.
 Disable that option for soft vapor. Cancel discards changes; Reset defaults
 changes your draft. Preview uses saved settings. Settings survive restarts
-in config/breath_fog.json. Existing files default to the soft style.
+in config/breath_fog.json. New configs and Reset defaults use pixelated vapor. Existing explicit style choices are preserved.
 
 Only the viewing client needs this mod. Servers and nearby players need
 no installation. The mod changes no gameplay and sends no packets.
@@ -28,3 +28,6 @@ and the icon are bundled; no extra resource pack is needed.
 Build with Java 25 using ./gradlew clean check build (gradlew.bat on Windows).
 README.md lists installations, TESTING.txt records the exact acceptance
 matrix and limits, and PORTING.md explains the multi-loader implementation.
+
+Pixelated breath is the default in new configs and after Reset defaults.
+Explicitly saved soft-style choices remain unchanged.
