@@ -2,6 +2,19 @@
 
 A quiet, client-only Minecraft **26.2 / Fabric** mod. Cold air becomes visible for you and nearby players as layered, curling breath vapor. First-person wisps sit below your aim; both third-person cameras show a mouth-relative plume. Released vapor stays in the world, and movement nudges it into soft trails.
 
+## Minecraft version branches
+
+| Minecraft | Maintained loaders | Source |
+| --- | --- | --- |
+| 26.3 | Fabric, Forge, NeoForge | [26.3](https://github.com/DerkOttersberg/breath-fog/tree/26.3) |
+| 1.21.1 | Fabric, Forge, NeoForge | [1.21.1](https://github.com/DerkOttersberg/breath-fog/tree/1.21.1) |
+| 1.20.1 | Fabric, Forge | [1.20.1](https://github.com/DerkOttersberg/breath-fog/tree/1.20.1) |
+| 26.2 | Historical Fabric MVP | [26.2](https://github.com/DerkOttersberg/breath-fog/tree/26.2) |
+
+The maintained branches include soft vapor and a saved **Pixelated Minecraft style** toggle. Each Minecraft version keeps its supported loaders together. Use its own installation instructions, dependency pins, and TESTING.txt; binaries are specific to that version. Quilt is outside the maintained support matrix.
+
+This branch preserves the original 26.2 Fabric MVP. Open a maintained version branch above for the completed multi-loader implementation and pixel option.
+
 ## Install
 
 Download the installable JAR from [Releases](https://github.com/DerkOttersberg/breath-fog/releases). This is an MVP test build: [TESTING.txt](TESTING.txt) records the completed checks and remaining acceptance work.
