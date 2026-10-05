@@ -1,6 +1,6 @@
 # Contributing
 
-Choose the branch matching the exact Minecraft version. Keep all its supported loaders in that branch; avoid permanent per-loader branches. Preserve `breath_fog` and the local config filename so upgrades retain settings. Code and original assets are CC0-1.0.
+Choose the branch matching the exact Minecraft version. Keep all its supported loaders in that branch; avoid permanent per-loader branches. Preserve `breath_fog` and the local config filename so upgrades retain settings. New original material follows the All Rights Reserved policy in LICENSE.txt. Earlier CC0 material retains its original terms; see LICENSES/README.md.
 
 Before a source change is accepted, run the branch's `clean check build` and inspect the runtime JARs. Java/toolchain and loader pins live in `gradle/libs.versions.toml`. Legacy branches use regular Loom and installable `remapJar` outputs; development and QA JARs are not release artifacts.
 
