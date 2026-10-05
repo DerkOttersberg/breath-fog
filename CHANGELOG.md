@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1+mc1.21.1
+
+- Make pixelated Minecraft-style breath the default for fresh configs and Reset defaults; preserve explicit saved soft-style choices.
+- Bundle the owner-supplied 400×400 icon unchanged for loader menus.
+- Verify fresh/default config persistence, explicit soft-style migration, and exact packaged icon bytes.
+
 ## 1.0.0+mc1.21.1
 
 - Ported both vapor styles, responsive settings, local preview/config commands, reload cleanup, and bounded client simulation to Minecraft 1.21.1.
@@ -9,6 +15,12 @@
 - See TESTING.txt for version-specific actual acceptance.
 
 # Changes
+
+## 1.0.1+mc1.21.1
+
+- Default new configs and Reset defaults to pixelated Minecraft-style breath while preserving saved soft-style choices.
+- Bundle the owner-supplied 400x400 PNG icon unchanged for loader menus.
+- Add config migration checks and exact packaged-icon validation.
 
 ## 1.0.0+mc26.3
 

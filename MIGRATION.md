@@ -2,7 +2,7 @@
 
 Install the JAR built for the exact Minecraft version and loader, replacing the previous Breath Fog JAR. Keep one Breath Fog runtime JAR in the profile. Fabric also needs the matching Fabric API; Mod Menu is optional. Forge and NeoForge provide their own Mods config entry.
 
-The mod ID remains `breath_fog`, and settings remain in `config/breath_fog.json`. Existing settings keep their values. Configs without `pixelated` default to soft vapor. Enable **Pixelated Minecraft style** on the Appearance page and select **Save** to persist it; **Cancel** discards the draft.
+The mod ID remains `breath_fog`, and settings remain in `config/breath_fog.json`. Existing settings keep their values. Fresh configs and configs without `pixelated` default to pixelated vapor. An explicitly saved `pixelated: false` choice remains soft vapor. **Reset defaults** now selects pixelated vapor; select **Save** to apply it; **Cancel** discards the draft.
 
 Malformed configs are preserved while defaults are used. Saving recovered settings first copies the original bytes to a unique `breath_fog-invalid-*.json.bak` file. A failed write reports an error and leaves the settings screen open.
 
