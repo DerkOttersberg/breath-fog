@@ -144,6 +144,10 @@ public final class QaClient {
                     status.addProperty("sleeping",client.player.isSleeping());
                     status.addProperty("alive",client.player.isAlive());
                     status.addProperty("riding",client.player.isPassenger());
+                    status.addProperty("fixtureFloor",client.level.getBlockState(new net.minecraft.core.BlockPos(0,199,0)).toString());
+                    status.addProperty("fixtureChunks",client.level.hasChunkAt(new net.minecraft.core.BlockPos(-8,199,-8)) && client.level.hasChunkAt(new net.minecraft.core.BlockPos(8,199,8)));
+                    status.addProperty("glassFixture",client.level.getBlockState(new net.minecraft.core.BlockPos(0,201,1)).toString());
+                    status.addProperty("headYaw",client.player.getYHeadRot());
                     var owned=BreathFogClient.class.getDeclaredField("particles"); owned.setAccessible(true);
                     var fade=BreathParticle.class.getDeclaredField("collisionFade"); fade.setAccessible(true);
                     int collided=0;
@@ -243,14 +247,27 @@ public final class QaClient {
                 actor.setYRot(180); actor.setYHeadRot(180); client.level.addEntity(actor); actors.add(actor);
             }
         }
+        if (command.has("collisionProbe")) {
+            var atlas=(net.minecraft.client.renderer.texture.TextureAtlas)client.getTextureManager().getTexture(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_PARTICLES);
+            var controller=BreathFogClient.instance();
+            var sprite=atlas.getSprite(io.github.derkottersberg.breathfog.BreathFog.id("particle/pixel_wisp_0"));
+            var probe=new BreathParticle(client.level,new net.minecraft.world.phys.Vec3(0.5,201.5,0.96),new net.minecraft.world.phys.Vec3(0,0,0.20),sprite,true,0.85,controller);
+            var field=BreathFogClient.class.getDeclaredField("particles"); field.setAccessible(true);
+            ((List<BreathParticle>)field.get(controller)).add(probe);
+            client.particleEngine.add(probe);
+        }
         if (command.has("motion")) actorMotion=command.get("motion").getAsDouble();
         if (command.has("resourcePack")) {
             String pack=command.get("resourcePack").getAsString();
             var repository=client.getResourcePackRepository(); repository.reload();
-            repository.setSelected(pack.isEmpty() ? List.of() : List.of(pack));
+            var selected=new ArrayList<>(repository.getSelectedIds());
+            selected.removeIf(id -> id.equals("file/breath-fog-no-sprites"));
+            if (!pack.isEmpty()) selected.add(pack);
+            repository.setSelected(selected);
         }
         if (command.has("reload")) resourceReload=client.reloadResourcePacks();
         if (command.has("connect")) {
+            if (client.level!=null) client.level.disconnect();
             client.disconnect();
             String address=command.get("connect").getAsString();
             net.minecraft.client.gui.screens.ConnectScreen.startConnecting(new net.minecraft.client.gui.screens.TitleScreen(),client,
@@ -258,7 +275,8 @@ public final class QaClient {
                 new net.minecraft.client.multiplayer.ServerData("QA",address,net.minecraft.client.multiplayer.ServerData.Type.OTHER),false,null);
             actors.clear();
         }
-        if (command.has("disconnect")) { client.disconnect(); actors.clear(); }
+        if (command.has("disconnect")) { if (client.level!=null) client.level.disconnect();
+            client.disconnect(); actors.clear(); }
         if (command.has("shader")) {
             Class<?> iris=Class.forName("net.irisshaders.iris.Iris");
             Object cfg=iris.getMethod("getIrisConfig").invoke(null);

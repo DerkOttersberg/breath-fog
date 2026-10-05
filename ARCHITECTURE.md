@@ -24,7 +24,7 @@ Selection work is bounded to a 24-item nearest list while scanning the current w
 
 ## Primary research
 
-The initial design research below belongs to the 26.2 foundation. The 26.3 port uses the current catalog pins, inspected official 26.3 classes, and fresh packaged-client acceptance on every supported loader. Historical shader and hardware results do not establish 26.3 acceptance.
+The links below document the original 26.2 research. This 1.21.1 port uses its own catalog pins, inspected official Minecraft classes, and packaged production-client acceptance. Historical shader/hardware results do not establish acceptance for this branch.
 
 - [Seamless Crafting version catalog](https://github.com/DerkOttersberg/seamless-crafting/blob/26.2/gradle/libs.versions.toml): Gradle 9.5.1, Java 25, Architectury plugin 3.5.169, Loom 1.17.491, Loader 0.19.3, Fabric API 0.159.0+26.2.
 - [Fabric 26.2 update](https://fabricmc.net/2026/06/15/262.html) and [Fabric particle documentation](https://docs.fabricmc.net/develop/rendering/particles/creating-particles): current client APIs and vanilla rendering integration.

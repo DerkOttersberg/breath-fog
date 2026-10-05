@@ -4,6 +4,7 @@
 
 - Ported both vapor styles, responsive settings, local preview/config commands, reload cleanup, and bounded client simulation to Minecraft 1.21.1.
 - Added packaged Fabric, Forge, and NeoForge adapters with native settings integration and production remapping.
+- Kept settings labels and tooltips sharp in the 1.21.1 screen render pipeline.
 - Preserved config compatibility and original CC0 code/assets.
 - See TESTING.txt for version-specific actual acceptance.
 

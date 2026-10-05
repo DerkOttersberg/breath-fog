@@ -22,6 +22,7 @@ copy_files(stage, output / 'build/history', {'.log'})
 shutil.copy2(stage / sys.argv[3], output / 'build/build-log.txt')
 shutil.copytree(stage / 'common/build/test-results/test', output / 'build/test-results', dirs_exist_ok=True)
 shutil.copytree(stage / 'common/build/reports/tests/test', output / 'build/test-report', dirs_exist_ok=True)
+copy_files(stage / 'driver-snapshots', output / 'driver-snapshots', {'.py'})
 copy_files(stage / 'playtest', output / 'playtest', {'.log'})
 for profile in (stage / 'playtest').iterdir():
     if profile.is_dir():
