@@ -1,6 +1,6 @@
 # Breath Fog
 
-A quiet, client-only Minecraft **26.2 / Fabric** mod. Cold air becomes visible for you and nearby players as layered, curling breath vapor. First-person wisps sit below your aim; both third-person cameras show a mouth-relative plume. Released vapor stays in the world, and movement nudges it into soft trails.
+Client-only cold-biome breath vapor, with soft and pixelated styles on the maintained Minecraft version branches below. Each branch contains its supported loaders, source, build instructions, screenshots and acceptance report.
 
 ## Minecraft version branches
 
@@ -13,7 +13,7 @@ A quiet, client-only Minecraft **26.2 / Fabric** mod. Cold air becomes visible f
 
 The maintained branches include soft vapor and a saved **Pixelated Minecraft style** toggle. Each Minecraft version keeps its supported loaders together. Use its own installation instructions, dependency pins, and TESTING.txt; binaries are specific to that version. Quilt is outside the maintained support matrix.
 
-This branch preserves the original 26.2 Fabric MVP. Open a maintained version branch above for the completed multi-loader implementation and pixel option.
+This default branch preserves the original 26.2 Fabric MVP and its historical evidence. Open a maintained version branch above for the completed multi-loader implementation and pixel option.
 
 ## Install
 
