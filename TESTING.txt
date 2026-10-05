@@ -27,8 +27,10 @@ four 128x128 RGBA textures with transparent borders, and four additive,
 namespaced particle-atlas entries. They reject QA classes, embedded game
 or Fabric classes, renderer mixins, foreign loader metadata and core shaders.
 Common isolation checks passed: no loader references in common and no
-Minecraft references in the portable core. Fabric-only CI is configured;
-the GitHub-hosted job was not run because no remote repository was created.
+Minecraft references in the portable core. Fabric-only CI is configured.
+After publishing to GitHub, the hosted job could not start: GitHub reported
+that the account is locked due to a billing issue. This is not a compilation
+or test failure; no workflow steps ran. The completed build/tests are local.
 See evidence/build-log.txt and the two JUnit XML reports.
 
 PACKAGED CLIENT — PASSED
