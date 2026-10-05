@@ -7,8 +7,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(BreathFog.ID)
 public final class BreathFogForge {
-    public BreathFogForge(FMLJavaModLoadingContext context) {
-        if (FMLEnvironment.dist.isClient()) BreathFogForgeClient.initialize(context);
+    public BreathFogForge() {
+        if (FMLEnvironment.dist.isClient()) BreathFogForgeClient.initialize(FMLJavaModLoadingContext.get());
     }
 }
-

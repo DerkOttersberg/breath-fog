@@ -1,12 +1,13 @@
 package io.github.derkottersberg.breathfog.qa;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.minecraft.client.Minecraft;
-@Mod(value="breath_fog_qa", dist=Dist.CLIENT)
+@Mod("breath_fog_qa")
 public final class NeoForgeQa {
     public NeoForgeQa() {
+        if (!FMLEnvironment.dist.isClient()) return;
         var qa = new QaClient(); qa.initialize(net.neoforged.fml.loading.FMLPaths.GAMEDIR.get());
         QaClient.nativeConfigFactory=parent -> {
             var container=net.neoforged.fml.ModList.get().getModContainerById("breath_fog").orElseThrow();

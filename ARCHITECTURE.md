@@ -1,6 +1,6 @@
 # Architecture and decisions
 
-Fabric, Forge, and NeoForge pass services and client lifecycle callbacks to `BreathFogClient`. The controller reads existing players and biome holders, smooths cold exposure, advances independent breathing clocks, selects the nearest players, and emits direct `BreathParticle` instances through the vanilla particle engine. Particle ticks sample a small analytic field and nearby-player wakes; vanilla extraction interpolates their world positions and submits textured, lit quads with depth testing.
+Fabric, Forge, and NeoForge pass services and client lifecycle callbacks to `BreathFogClient`. The controller reads existing players and biome holders, smooths cold exposure, advances independent breathing clocks, selects the nearest players, and emits direct `BreathParticle` instances through the vanilla particle engine. Particle ticks sample a small analytic field and nearby-player wakes; vanilla rendering interpolates their world positions and submits textured, lit quads with depth testing.
 
 Each emitter is keyed by UUID, with a seeded initial breath phase, exposure state, cached biome target, previous eye position, and a per-exhalation particle budget. Players leaving the nearest-player set are evicted before replacements are created, keeping tracked emitters inside the cap even while players exchange places. Camera switches alter visibility and the origin of future breaths; old particles retain their world position and the same clock continues. Connection or level changes clear owned particles and emitters. Resource reload invalidates sprite handles and clears only this mod's particles.
 
@@ -18,10 +18,16 @@ The `assets/minecraft/atlases/particles.json` resource contains eight additive n
 
 ## Shader and performance boundary
 
-The renderer uses `SingleQuadParticle.Layer.TRANSLUCENT` and vanilla lighting. Iris has its own integration of the particle feature renderer; Breath Fog leaves that integration in control. Background refraction and custom blend/framebuffer pipelines are deferred because they would expand the compatibility surface significantly. Pack-specific brightness and ordering are not forced by the mod.
+The renderer uses `TextureSheetParticle` with `PARTICLE_SHEET_TRANSLUCENT` and vanilla lighting. Iris has its own integration of the particle feature renderer; Breath Fog leaves that integration in control. Background refraction and custom blend/framebuffer pipelines are deferred because they would expand the compatibility surface significantly. Pack-specific brightness and ordering are not forced by the mod.
 
 Selection work is bounded to a 24-item nearest list while scanning the current world's player list. Simulation has a 256-particle cap, at most eight wake samples per particle, no particle-particle interaction, and reused three-component scratch arrays. The normal target is far below that cap: a nearby emitter uses 12 particles per breath, fewer at distance or with reduced vanilla particle settings.
 
 ## Primary research
 
 The initial design research below belongs to the 26.2 foundation. The 26.3 port uses the current catalog pins, inspected official 26.3 classes, and fresh packaged-client acceptance on every supported loader. Historical shader and hardware results do not establish 26.3 acceptance.
+
+- [Seamless Crafting version catalog](https://github.com/DerkOttersberg/seamless-crafting/blob/26.2/gradle/libs.versions.toml): Gradle 9.5.1, Java 25, Architectury plugin 3.5.169, Loom 1.17.491, Loader 0.19.3, Fabric API 0.159.0+26.2.
+- [Fabric 26.2 update](https://fabricmc.net/2026/06/15/262.html) and [Fabric particle documentation](https://docs.fabricmc.net/develop/rendering/particles/creating-particles): current client APIs and vanilla rendering integration.
+- [Bridson, Hourihan and Nordenstam, Curl-Noise for Procedural Fluid Flow](https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph2007-curlnoise.pdf): the principle of deriving a divergence-free field from a vector potential. This MVP uses its own small analytic sinusoidal potential, rather than claiming a full fluid simulation or copying a solver.
+- [Iris 26.2 particle integration](https://github.com/IrisShaders/Iris/blob/26.2/common/src/main/java/net/irisshaders/iris/mixin/MixinParticleEngine.java): the standard particle submission path is integrated into Iris's rendering phases.
+- Minecraft 26.2's official client JAR was inspected locally to verify current APIs, atlas IDs, and the existing particle shader's alpha cutoff. These details were then checked in live game runs.

@@ -1,6 +1,6 @@
 # Breath Fog
 
-Client-only breath vapor for **Minecraft Java 26.3**, supporting **Fabric, Forge, and NeoForge**. Cold air becomes visible for you and nearby players as layered exhalations. Choose soft vapor or a pixelated Minecraft style in the settings.
+Client-only breath vapor for **Minecraft Java 1.21.1**, supporting **Fabric, Forge, and NeoForge**. Cold air becomes visible for you and nearby players as layered exhalations. Choose soft vapor or a pixelated Minecraft style in the settings.
 
 ## Minecraft version branches
 
@@ -15,15 +15,15 @@ Each version branch contains every supported loader for that Minecraft version. 
 
 ## Install
 
-Use Java 25 and the JAR matching your loader:
+Use Java 21 and the JAR matching your loader:
 
 | Loader | Tested version | Required extras |
 | --- | --- | --- |
-| Fabric | 0.19.5 | Fabric API 0.161.0+26.3 |
-| Forge | 66.0.9 | None |
-| NeoForge | 26.3.0.48-beta | None |
+| Fabric | 0.19.5 | Fabric API 0.116.17+1.21.1 |
+| Forge | 52.1.16 | None |
+| NeoForge | 21.1.255 | None |
 
-Install one `breath-fog-1.0.0+mc26.3-<loader>.jar` in your profile's `mods` folder. The listed NeoForge loader is a beta build. The older Fabric 26.2 source remains on branch `26.2`.
+Install one `breath-fog-1.0.0+mc1.21.1-<loader>.jar` in your profile's `mods` folder. The older Fabric 26.2 source remains on branch `26.2`.
 
 Only the viewer needs the mod. Servers and other players need no installation. It sends no packets, registers no particle types, changes no gameplay, and stores no world data. Breath timing is independently simulated by each viewer.
 
@@ -38,7 +38,7 @@ Open `/breathfog config`, Mod Menu on Fabric (optional), or Forge/NeoForge's Mod
 
 Settings are local to your client, in `config/breath_fog.json`. Existing configs retain their values and default to soft vapor. Invalid configs remain intact during recovery; a subsequent Save first preserves their original bytes in a uniquely named `.json.bak` file. Writes are atomic when supported by the filesystem.
 
-Actual 26.3 screenshots: [soft vapor](docs/images/26.3/soft-first.png), [pixelated vapor](docs/images/26.3/pixel-first.png), and [Appearance settings](docs/images/26.3/settings-pixel-toggle.png).
+Historical 26.3 screenshots: [soft vapor](docs/images/26.3/soft-first.png), [pixelated vapor](docs/images/26.3/pixel-first.png), and [Appearance settings](docs/images/26.3/settings-pixel-toggle.png).
 
 ## Behavior
 
@@ -50,8 +50,8 @@ Rendering uses vanilla's lit translucent particle path and depth testing. Origin
 
 ## Build and verification
 
-With Java 25 selected: `./gradlew clean check build` (`gradlew.bat` on Windows). `build.ps1` can obtain a project-local, checksum-verified Java toolchain. Loader runtime and source JARs appear in each loader's `build/libs` folder. Architectury is build tooling; no Architectury API runtime dependency is required. This existing client visual mod remains independently installable and uses no SeamlessLib contracts.
+With Java 25 running Gradle and Java 21 available as a toolchain: `./gradlew clean check build` (`gradlew.bat` on Windows). `build.ps1` can obtain a project-local, checksum-verified Java toolchain. Loader runtime and source JARs appear in each loader's `build/libs` folder. Architectury is build tooling; no Architectury API runtime dependency is required. This existing client visual mod remains independently installable and uses no SeamlessLib contracts.
 
-`check` runs the portable unit tests, common-loader isolation, and all three packaged-JAR checks. See [TESTING.txt](TESTING.txt) for exact runtime evidence and limits. The separately packaged `-Pqa :fabric:qaHelperJar :forge:qaHelperJar :neoforge:qaHelperJar` instrumentation is never included in a runtime JAR. [.github/scripts/playtest_isolated.py](.github/scripts/playtest_isolated.py) drives copied production profiles through a private WSL Xvfb display.
+`check` runs the portable unit tests, common-loader isolation, and all 3 packaged-JAR checks. See [TESTING.txt](TESTING.txt) for exact runtime evidence and limits. The separately packaged `-Pqa :fabric:remapQaHelperJar :forge:remapQaHelperJar :neoforge:remapQaHelperJar` instrumentation is never included in a runtime JAR. [.github/scripts/playtest_isolated.py](.github/scripts/playtest_isolated.py) drives copied production profiles through a private WSL Xvfb display.
 
 See [PORTING.md](PORTING.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [art/ASSETS.md](art/ASSETS.md). Original code and assets are dedicated under CC0.

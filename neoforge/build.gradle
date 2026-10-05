@@ -1,4 +1,4 @@
-plugins { id 'dev.architectury.loom-no-remap' }
+plugins { id 'dev.architectury.loom' }
 base { archivesName = rootProject.archives_base_name }
 sourceSets.main {
     java.srcDir rootProject.file('common/src/main/java')
@@ -7,6 +7,7 @@ sourceSets.main {
 
 dependencies {
     minecraft libs.minecraft
+    mappings loom.officialMojangMappings()
     neoForge libs.neoforge
 }
 loom { mods { breath_fog { sourceSet sourceSets.main } } }
@@ -16,7 +17,7 @@ processResources {
 }
 tasks.named('jar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveFileName = "breath-fog-${project.version}-neoforge.jar"
+    archiveFileName = "breath-fog-${project.version}-neoforge-dev.jar"
 }
 tasks.named('sourcesJar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -24,3 +25,6 @@ tasks.named('sourcesJar', Jar) {
 }
 
 apply from: rootProject.file('gradle/qa.gradle')
+
+tasks.named("remapJar") { archiveFileName = "breath-fog-${project.version}-neoforge.jar" }
+tasks.named("remapSourcesJar") { archiveFileName = "breath-fog-${project.version}-neoforge-sources.jar" }

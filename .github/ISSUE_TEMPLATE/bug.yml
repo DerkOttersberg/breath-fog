@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a Breath Fog problem with a reproducible game setup.
+body:
+  - type: dropdown
+    id: minecraft
+    attributes:
+      label: Minecraft version
+      options: ['26.3', '1.21.1', '1.20.1', '26.2 (historical MVP)']
+    validations:
+      required: true
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Loader
+      options: [Fabric, Forge, NeoForge]
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Mod and loader versions
+      description: Include Fabric API and Mod Menu versions when installed.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps, expected behavior, and actual behavior
+      description: Include biome, camera view, soft/pixel style, and any shader or resource packs.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots and relevant client log
+      description: Attach the capture or log section showing the problem.

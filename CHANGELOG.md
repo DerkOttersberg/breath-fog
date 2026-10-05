@@ -1,3 +1,12 @@
+# Changelog
+
+## 1.0.0+mc1.21.1
+
+- Ported both vapor styles, responsive settings, local preview/config commands, reload cleanup, and bounded client simulation to Minecraft 1.21.1.
+- Added packaged Fabric, Forge, and NeoForge adapters with native settings integration and production remapping.
+- Preserved config compatibility and original CC0 code/assets.
+- See TESTING.txt for version-specific actual acceptance.
+
 # Changes
 
 ## 1.0.0+mc26.3

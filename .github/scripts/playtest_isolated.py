@@ -17,6 +17,8 @@ source, loader, template, wrapper, output = sys.argv[1:6]
 source, template, output = map(pathlib.Path, (source, template, output))
 assert loader in ('fabric', 'forge', 'neoforge'), 'Unsupported loader'
 artifact_loader = loader
+mc = __import__('tomllib').loads((source / 'gradle/libs.versions.toml').read_text())['versions']['minecraft']
+menu_version = __import__('tomllib').loads((source / 'gradle/libs.versions.toml').read_text())['versions']['modmenu']
 output.mkdir(parents=True, exist_ok=False)
 client = output / 'client'
 (client / 'mods').mkdir(parents=True)
@@ -35,6 +37,11 @@ for key, value in {'renderDistance':'5','simulationDistance':'5','guiScale':'2',
     lines = [line for line in options.splitlines() if not line.startswith(key + ':')]
     options = '\n'.join(lines) + '\n' + key + ':' + value + '\n'
 (client / 'options.txt').write_text(options)
+missing_pack = client / 'resourcepacks/breath-fog-no-sprites'
+(missing_pack / 'assets/minecraft/atlases').mkdir(parents=True)
+(missing_pack / 'pack.mcmeta').write_text(json.dumps({'pack': {'pack_format': 34 if mc == '1.21.1' else 15, 'description': 'Owned missing-sprite QA fixture'}}))
+(missing_pack / 'assets/minecraft/atlases/particles.json').write_text(json.dumps({'sources': [{'type': 'minecraft:filter', 'pattern': {'namespace': 'breath_fog'}}]}))
+
 for jar in (source / artifact_loader / 'build/libs').glob('*.jar'):
     if jar.name.endswith(f'-{artifact_loader}.jar') and ('-sources' not in jar.name):
         shutil.copy2(jar, client / 'mods')
@@ -45,17 +52,18 @@ if len(sys.argv) > 6:
     for jar in pathlib.Path(sys.argv[6]).glob(f'*-{artifact_loader}.jar'):
         shutil.copy2(jar, client / 'mods')
     if artifact_loader == 'fabric':
-        menu = list(pathlib.Path('/root/.gradle/caches/modules-2/files-2.1/com.terraformersmc/modmenu/21.0.0').glob('*/*.jar'))
+        menu = list((pathlib.Path('/root/.gradle/caches/modules-2/files-2.1/com.terraformersmc/modmenu') / menu_version).glob(f'*/modmenu-{menu_version}.jar'))
         if menu:
             shutil.copy2(menu[0], client / 'mods')
 cmd = json.loads((template / 'launch-command.json').read_text())
 cmd = [arg for arg in cmd if not arg.startswith('-Dqa.')]
 cmd[cmd.index('--gameDir') + 1] = str(client)
 cmd[cmd.index('--username') + 1] = 'BreathQA'
-if '--graphicsBackend' in cmd:
-    cmd[cmd.index('--graphicsBackend') + 1] = os.environ.get('BREATH_FOG_QA_BACKEND', 'vulkan')
-else:
-    cmd += ['--graphicsBackend', os.environ.get('BREATH_FOG_QA_BACKEND', 'vulkan')]
+if mc.startswith('26.'):
+    if '--graphicsBackend' in cmd:
+        cmd[cmd.index('--graphicsBackend') + 1] = os.environ.get('BREATH_FOG_QA_BACKEND', 'vulkan')
+    else:
+        cmd += ['--graphicsBackend', os.environ.get('BREATH_FOG_QA_BACKEND', 'vulkan')]
 (output / 'launch-command.json').write_text(json.dumps(cmd, indent=2))
 (output / 'hashes.json').write_text(json.dumps({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (client/'mods').glob('*.jar')}, indent=2))
 log = (output / 'console.log').open('w')
@@ -127,6 +135,24 @@ try:
         send(closeScreen=True)
     shot('soft-first', 5, preview=True, camera='FIRST_PERSON', actors=7)
     shot('soft-third-front', 5, preview=True, camera='THIRD_PERSON_FRONT')
+    # Exercise each visibility toggle through its real visible button and Save.
+    for label, camera in [('Nearby players', 'FIRST_PERSON'), ('First person', 'FIRST_PERSON'), ('Third person', 'THIRD_PERSON_FRONT')]:
+        send(actors=0, camera=camera, config=True)
+        send(uiToggle=label)
+        send(uiClick='Save')
+        if label == 'Nearby players':
+            send(actors=7, preview=True)
+            time.sleep(2)
+            assert state()['emitters'] == 1
+        else:
+            send(preview=True)
+            time.sleep(2)
+            assert state()['particles'] == 0
+        record(label.lower().replace(' ', '-') + '-visibility-toggle', state())
+        send(config=True)
+        send(uiToggle=label)
+        send(uiClick='Save')
+    send(actors=7)
     send(clientCommand='breathfog config')
     until(lambda s:s.get('screen') == 'BreathFogConfigScreen', 15)
     record('local-config-command', state())
@@ -158,6 +184,20 @@ try:
     send(drive='none', reload=True)
     until(lambda s:not s.get('reloading') and not s.get('paused'), 90)
     shot('pixel-after-resource-reload', 5, preview=True, camera='THIRD_PERSON_FRONT')
+    send(resourcePack='file/breath-fog-no-sprites', reload=True)
+    until(lambda s:not s.get('reloading') and not s.get('paused'), 90)
+    send(preview=True)
+    time.sleep(3)
+    assert state()['particles'] == 0, 'Missing sprites must suspend emission'
+    record('missing-sprites-suspend-emission', state())
+    send(resourcePack='', reload=True)
+    until(lambda s:not s.get('reloading') and not s.get('paused'), 90)
+    shot('resource-pack-removal-restores-breath', 5, preview=True)
+    send(actors=0, camera='THIRD_PERSON_FRONT', commands=['tp BreathQA 0 200 0','fill -8 200 1 8 205 1 minecraft:glass'], preview=True)
+    until(lambda s:s.get('collidedParticles', 0) > 0, 12)
+    record('glass-collision-fades-wisps', state())
+    send(commands=['fill -8 200 1 8 205 1 minecraft:air'])
+
     send(actors=48, motion=.07, preview=True)
     until(lambda s:s.get('emitters') == 24 and not s.get('paused'), 20)
     time.sleep(6)
@@ -204,10 +244,10 @@ try:
     record('underwater-suppressed', state())
     send(commands=['fill -2 200 -2 2 203 2 minecraft:air','tp BreathQA 0 200 0'], drive='sneak', preview=True)
     shot('sneaking-breath', 2, camera='THIRD_PERSON_FRONT')
-    send(drive='none', commands=['summon minecraft:oak_boat 0 200 0','ride BreathQA mount @e[type=minecraft:oak_boat,limit=1,sort=nearest]'], preview=True)
+    send(drive='none', commands=['summon minecraft:boat 0 200 0 {Type:oak}','ride BreathQA mount @e[type=minecraft:boat,limit=1,sort=nearest]'], preview=True)
     until(lambda s:s.get('riding'), 10)
     shot('riding-breath', 2)
-    send(commands=['ride BreathQA dismount','kill @e[type=minecraft:oak_boat]'])
+    send(commands=['ride BreathQA dismount','kill @e[type=minecraft:boat]'])
     send(drive='none', commands=['gamemode survival BreathQA','kill BreathQA'])
     time.sleep(3)
     assert not state()['alive'] and state()['particles'] == 0
@@ -231,8 +271,8 @@ try:
     process.wait(timeout=40)
     if process.returncode != 0:
         raise RuntimeError(f'Nonzero exit {process.returncode}')
-    backend = next((line.strip() for line in (output/'console.log').read_text().splitlines() if 'Using graphics backend' in line), 'Backend unknown')
-    (output/'PASS.json').write_text(json.dumps({'loader':loader,'scenarios':results,'driver':backend,'display':'private WSL Xvfb','mods':[p.name for p in (client/'mods').glob('*.jar')]}, indent=2))
+    backend = next((line.strip() for line in (output/'console.log').read_text().splitlines() if 'Using graphics backend' in line or 'OpenGL renderer' in line or 'OpenGL version' in line), 'Backend unknown')
+    (output/'PASS.json').write_text(json.dumps({'loader':loader,'scenarios':results,'driver':backend,'graphicsRenderer':state().get('graphicsRenderer'),'graphicsVersion':state().get('graphicsVersion'),'display':'private WSL Xvfb','mods':[p.name for p in (client/'mods').glob('*.jar')]}, indent=2))
 finally:
     if process.poll() is None:
         os.killpg(process.pid, signal.SIGTERM)

@@ -17,11 +17,11 @@ final class BreathFogForgeClient {
     static void initialize(FMLJavaModLoadingContext context) {
         var controller = BreathFogClient.instance();
         controller.initialize(new Services());
-        TickEvent.ClientTickEvent.Post.BUS.addListener(event -> controller.tick(Minecraft.getInstance()));
-        ClientPlayerNetworkEvent.LoggingOut.BUS.addListener(event -> controller.clear());
-        RegisterClientCommandsEvent.BUS.addListener(event -> BreathFogCommands.register(event.getDispatcher()));
-        context.getContainer().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
-            () -> new ConfigScreenHandler.ConfigScreenFactory(BreathFogConfigScreen::new));
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((TickEvent.ClientTickEvent event) -> { if (event.phase == TickEvent.Phase.END) controller.tick(Minecraft.getInstance()); });
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> controller.clear());
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener((RegisterClientCommandsEvent event) -> BreathFogCommands.register(event.getDispatcher()));
+        net.minecraftforge.fml.ModLoadingContext.get().registerExtensionPoint(ConfigScreenHandler.ConfigScreenFactory.class,
+            () -> new ConfigScreenHandler.ConfigScreenFactory((client, parent) -> new BreathFogConfigScreen(parent)));
     }
     private static final class Services implements ClientPlatformServices {
         public String loaderName() { return "Forge"; }

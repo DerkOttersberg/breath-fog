@@ -1,8 +1,8 @@
 modLoader="javafml"
-loaderVersion="[66,)"
+loaderVersion="[52,)"
 license="CC0-1.0"
 issueTrackerURL="https://github.com/DerkOttersberg/breath-fog/issues"
-clientSideOnly=true
+
 [[mods]]
 modId="breath_fog"
 version="${version}"
@@ -10,21 +10,21 @@ displayName="Breath Fog"
 logoFile="assets/breath_fog/icon.png"
 displayURL="https://github.com/DerkOttersberg/breath-fog"
 authors="Derk Ottersberg"
+displayTest="IGNORE_ALL_VERSION"
 description='''Client-side cold breath vapor, with soft and pixelated Minecraft styles. Servers need no installation.'''
-[[mixins]]
-config="breathfog-forge.mixins.json"
+
 
 [features.breath_fog]
-javaVersion="[25,)"
+javaVersion="[21,)"
 [[dependencies.breath_fog]]
 modId="forge"
 mandatory=true
-versionRange="[66.0.9,67)"
+versionRange="[52.1.16,53)"
 ordering="NONE"
 side="CLIENT"
 [[dependencies.breath_fog]]
 modId="minecraft"
 mandatory=true
-versionRange="[26.3]"
+versionRange="[1.21.1]"
 ordering="NONE"
 side="CLIENT"

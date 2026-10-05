@@ -1,9 +1,10 @@
-plugins { id 'dev.architectury.loom-no-remap' }
+plugins { id 'dev.architectury.loom' }
 dependencies {
     minecraft libs.minecraft
-    implementation libs.fabric.loader
-    implementation libs.fabric.api
-    compileOnly libs.modmenu
+    mappings loom.officialMojangMappings()
+    modImplementation libs.fabric.loader
+    modImplementation libs.fabric.api
+    modCompileOnly libs.modmenu
     implementation project(':common')
 }
 loom { mods { breath_fog { sourceSet sourceSets.main; sourceSet project(':common').sourceSets.main } } }
@@ -15,10 +16,13 @@ processResources {
 tasks.named('jar', Jar) {
     from project(':common').sourceSets.main.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    archiveFileName = "breath-fog-${project.version}-fabric.jar"
+    archiveFileName = "breath-fog-${project.version}-fabric-dev.jar"
 }
 tasks.named('sourcesJar', Jar) {
     from project(':common').sourceSets.main.allSource
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName = "breath-fog-${project.version}-fabric-sources.jar"
 }
+
+tasks.named("remapJar") { archiveFileName = "breath-fog-${project.version}-fabric.jar" }
+tasks.named("remapSourcesJar") { archiveFileName = "breath-fog-${project.version}-fabric-sources.jar" }

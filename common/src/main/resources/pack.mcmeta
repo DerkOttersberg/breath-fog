@@ -1,1 +1,6 @@
-{"pack":{"description":"Breath Fog resources","min_format":[121,0],"max_format":[121,0]}}
+{
+  "pack": {
+    "pack_format": 34,
+    "description": "Breath Fog client assets"
+  }
+}
