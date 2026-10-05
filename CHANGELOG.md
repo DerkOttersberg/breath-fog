@@ -5,6 +5,7 @@
 - Default new configs and Reset defaults to pixelated Minecraft-style breath while preserving saved soft-style choices.
 - Bundle the owner-supplied 400x400 PNG icon unchanged for loader menus.
 - Add config migration checks and exact packaged-icon validation.
+- Correct NeoForge's mod-list icon metadata to use `logoFile` and check that reference during packaging.
 
 ## 1.0.0+mc26.3
 

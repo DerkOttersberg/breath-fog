@@ -1,5 +1,7 @@
 # Breath Fog
 
+<img src="common/src/main/resources/assets/breath_fog/icon.png" alt="Breath Fog" width="128">
+
 Client-only breath vapor for **Minecraft Java 26.3**, supporting **Fabric, Forge, and NeoForge**. Cold air becomes visible for you and nearby players as layered exhalations. Pixelated Minecraft-style vapor is the default; choose soft vapor in the settings if preferred.
 
 ## Minecraft version branches
@@ -38,7 +40,7 @@ Open `/breathfog config`, Mod Menu on Fabric (optional), or Forge/NeoForge's Mod
 
 Settings are local to your client, in `config/breath_fog.json`. Fresh configs and configs without a style selection default to pixelated vapor. Existing saved style choices retain their values. Invalid configs remain intact during recovery; a subsequent Save first preserves their original bytes in a uniquely named `.json.bak` file. Writes are atomic when supported by the filesystem.
 
-Actual 26.3 screenshots: [soft vapor](docs/images/26.3/soft-first.png), [pixelated vapor](docs/images/26.3/pixel-first.png), and [Appearance settings](docs/images/26.3/settings-pixel-toggle.png).
+Actual 26.3 screenshots: [soft vapor](docs/images/26.3/soft-first.png), [pixelated vapor](docs/images/26.3/pixel-first.png), and [Appearance settings](docs/images/26.3/settings-pixel-default.png).
 
 ## Behavior
 

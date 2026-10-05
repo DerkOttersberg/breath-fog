@@ -175,6 +175,22 @@ try:
     send(drive='none', reload=True)
     until(lambda s:not s.get('reloading') and not s.get('paused'), 90)
     shot('pixel-after-resource-reload', 5, preview=True, camera='THIRD_PERSON_FRONT')
+
+    if (source / 'focus-default-icon-update').exists():
+        address = os.environ.get('BREATH_FOG_QA_SERVER')
+        if address:
+            send(connect=address)
+            until(lambda s:s.get('world') and s.get('biome') == 'minecraft:snowy_plains', 90)
+            shot('unmodded-server-breath', 2, preview=True, camera='THIRD_PERSON_FRONT')
+        send(disconnect=True)
+        until(lambda s:not s.get('world') and s.get('particles') == 0, 15)
+        record('disconnect-cleanup', state())
+        send(stop=True)
+        process.wait(timeout=40)
+        assert process.returncode == 0, f'Nonzero client exit {process.returncode}'
+        backend = next((line.strip() for line in (output/'console.log').read_text().splitlines() if 'Using graphics backend' in line or 'OpenGL renderer' in line or 'OpenGL version' in line), 'Backend unknown')
+        (output/'PASS.json').write_text(json.dumps({'loader':loader,'scenarios':results,'scope':'default/icon update revalidation','driver':backend,'graphicsRenderer':state().get('graphicsRenderer'),'graphicsVersion':state().get('graphicsVersion'),'display':'private WSL Xvfb','mods':[p.name for p in (client/'mods').glob('*.jar')]},indent=2))
+        sys.exit(0)
     send(actors=48, motion=.07, preview=True)
     until(lambda s:s.get('emitters') == 24 and not s.get('paused'), 20)
     time.sleep(6)

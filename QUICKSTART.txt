@@ -1,4 +1,4 @@
-BREATH FOG 1.0.0 — MINECRAFT 26.3 / JAVA 25
+BREATH FOG 1.0.1 — MINECRAFT 26.3 / JAVA 25
 
 Install the runtime JAR matching your loader in your profile's mods folder.
 Fabric: Loader 0.19.5 + Fabric API 0.161.0+26.3.
