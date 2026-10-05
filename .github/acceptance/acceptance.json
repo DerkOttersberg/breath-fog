@@ -500,7 +500,7 @@
   "limitations": [
     "Software graphics on private WSL Xvfb; no hardware GPU benchmark.",
     "No current shader-pack matrix, authenticated LAN or second actual guest.",
-    "Synthetic remote actors and a deterministic production-particle collision probe are QA instrumentation, not networked guests.",
+    "Synthetic remote actors test emitter/particle budgets; they are not networked guests.",
     "Hosted CI status is separate from local acceptance."
   ],
   "productionSourceCommit": "637e2e9b4b9210346357f7a0b1d3a8d61366b7ac"
