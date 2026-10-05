@@ -1,5 +1,7 @@
 # Private client QA
 
+For default/icon-only updates after a full baseline acceptance, an owned staging tree may contain `focus-default-icon-update` to run the focused update suite. Its PASS record explicitly names that scope. It checks fresh/default and restart settings, native config access, Save/Cancel, validation, resize, both styles/cameras, reload, server connection and cleanup. Use the full suite for rendering, timing, lifecycle or platform behavior changes; retain the previous full acceptance separately.
+
 Shared instrumentation lives in `common/src/qa`; loader bootstraps and metadata live in each loader's `src/qa`. Build the separate helpers with `-Pqa :fabric:remapQaHelperJar :forge:remapQaHelperJar`. Runtime JAR verification rejects QA classes. Neither helpers nor development worlds are release artifacts.
 
 `.github/scripts/playtest_isolated.py` takes a Linux staging tree, loader, copied production-client template, isolated-display wrapper, and fresh output path. An optional sixth argument supplies matching sibling runtime JARs. `BREATH_FOG_QA_WORLD` selects an owned copied world; `BREATH_FOG_QA_SERVER` selects a loopback vanilla test server; `BREATH_FOG_QA_SKIP_MODMENU=1` omits the optional Fabric integration for an absence profile; `BREATH_FOG_QA_CONFIG` supplies a previously saved config to check a fresh process.
