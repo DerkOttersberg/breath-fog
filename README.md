@@ -55,3 +55,11 @@ With Java 25 running Gradle and Java 21 available as a toolchain: `./gradlew cle
 `check` runs the portable unit tests, common-loader isolation, and all 3 packaged-JAR checks. See [TESTING.txt](TESTING.txt) for exact runtime evidence and limits. The separately packaged `-Pqa :fabric:remapQaHelperJar :forge:remapQaHelperJar :neoforge:remapQaHelperJar` instrumentation is never included in a runtime JAR. [.github/scripts/playtest_isolated.py](.github/scripts/playtest_isolated.py) drives copied production profiles through a private WSL Xvfb display.
 
 See [MIGRATION.md](MIGRATION.md), [PORTING.md](PORTING.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [art/ASSETS.md](art/ASSETS.md). Original code and assets are dedicated under CC0.
+
+## License
+
+**All Rights Reserved** for new original material owned by Derk Ottersberg.
+See [LICENSE.txt](LICENSE.txt) and [licensing history](LICENSES/README.md) for prior-license and third-party exceptions.
+
+Public source may be viewed and forked on GitHub. Issues and pull requests are welcome;
+write access to this repository is reserved for the owner.
