@@ -2,6 +2,7 @@
 
 ## 1.0.1+mc1.21.1
 
+- Included the current owner license policy and preserved prior notices in runtime and source JARs; earlier granted rights remain unchanged.
 - Make pixelated Minecraft-style breath the default for fresh configs and Reset defaults; preserve explicit saved soft-style choices.
 - Bundle the owner-supplied 400×400 icon unchanged for loader menus.
 - Verify fresh/default config persistence, explicit soft-style migration, and exact packaged icon bytes.
