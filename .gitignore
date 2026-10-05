@@ -5,3 +5,6 @@
 .toolchains/
 .idea/
 *.iml
+
+__pycache__/
+*.py[cod]

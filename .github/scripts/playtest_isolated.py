@@ -51,7 +51,7 @@ if artifact_loader == 'fabric':
 if len(sys.argv) > 6:
     for jar in pathlib.Path(sys.argv[6]).glob(f'*-{artifact_loader}.jar'):
         shutil.copy2(jar, client / 'mods')
-    if artifact_loader == 'fabric':
+    if artifact_loader == 'fabric' and not os.environ.get('BREATH_FOG_QA_SKIP_MODMENU'):
         menu = list((pathlib.Path('/root/.gradle/caches/modules-2/files-2.1/com.terraformersmc/modmenu') / menu_version).glob(f'*/modmenu-{menu_version}.jar'))
         if menu:
             shutil.copy2(menu[0], client / 'mods')
@@ -72,12 +72,15 @@ process = subprocess.Popen(['bash', wrapper] + cmd, cwd=client, stdout=log, stde
 qa = client / 'qa'
 counter = 0
 results = []
+last_complete_status = {}
 
 def state():
+    global last_complete_status
     try:
-        return json.loads((qa / 'status.json').read_text())
+        last_complete_status = json.loads((qa / 'status.json').read_text())
     except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+        pass
+    return last_complete_status
 
 def until(predicate, seconds=90):
     end = time.monotonic() + seconds
@@ -85,6 +88,8 @@ def until(predicate, seconds=90):
         if process.poll() is not None:
             raise RuntimeError(f'Client exited {process.returncode}; see {output}/console.log')
         current = state()
+        if current.get('screen') in ('LoadingErrorScreen','ModLoadingErrorScreen'):
+            raise RuntimeError(f'Loader blocked startup on {current["screen"]}; inspect {output}/console.log')
         if predicate(current):
             return current
         time.sleep(0.2)
@@ -124,11 +129,14 @@ try:
         assert state()['pixelated'], 'Saved pixel style did not survive a fresh client process'
         record('restart-preserves-pixel-setting', state())
         send(pixelated=False)
-    send(closeScreen=True, enabled=True, commands=['difficulty peaceful','gamemode creative BreathQA','tp BreathQA 0 200 0','fill -8 199 -8 8 199 8 minecraft:gray_concrete','time set day','weather clear'])
-    time.sleep(3)
+    send(closeScreen=True, enabled=True, commands=['difficulty peaceful','gamemode creative BreathQA','tp BreathQA 0 200 0','time set day','weather clear'])
+    until(lambda s:s.get('fixtureChunks'), 30)
+    send(commands=['fill -8 199 -8 8 199 8 minecraft:gray_concrete','tp BreathQA 0 200 0'])
+    until(lambda s:'minecraft:gray_concrete' in s.get('fixtureFloor', ''), 15)
+    time.sleep(2)
     send(commands=['fillbiome -12 196 -12 12 220 12 minecraft:snowy_plains'], yaw=180)
     time.sleep(2)
-    if artifact_loader != 'fabric' or len(sys.argv) > 6:
+    if artifact_loader != 'fabric' or any((client / 'mods').glob('modmenu-*.jar')):
         send(nativeConfig=True)
         assert state()['screen'] == 'BreathFogConfigScreen', 'Native loader config factory failed'
         shot('native-mods-config')
@@ -193,7 +201,11 @@ try:
     send(resourcePack='', reload=True)
     until(lambda s:not s.get('reloading') and not s.get('paused'), 90)
     shot('resource-pack-removal-restores-breath', 5, preview=True)
-    send(actors=0, camera='THIRD_PERSON_FRONT', commands=['tp BreathQA 0 200 0','fill -8 200 1 8 205 1 minecraft:glass'], preview=True)
+    send(actors=0, camera='THIRD_PERSON_FRONT', commands=['tp BreathQA 0 200 0 180 0','fill -8 200 1 8 205 1 minecraft:glass']
+    )
+    time.sleep(1)
+    until(lambda s:'minecraft:glass' in s.get('glassFixture', ''), 10)
+    send(yaw=180, collisionProbe=True)
     until(lambda s:s.get('collidedParticles', 0) > 0, 12)
     record('glass-collision-fades-wisps', state())
     send(commands=['fill -8 200 1 8 205 1 minecraft:air'])
@@ -203,6 +215,28 @@ try:
     time.sleep(6)
     shot('crowded-player-budget', 5)
     assert state()['emitters'] == 24 and state()['peak'] <= 256
+    send(actors=0, motion=0, drive='none', cancelPreview=True)
+    starts = []
+    previous_particles = state().get('particles', 0)
+    previous_age = state().get('ownClockexhaleAge', -1)
+    clock_instrumented = 'ownClockexhaleAge' in state()
+    end = time.monotonic() + (30 if clock_instrumented else 12)
+    while time.monotonic() < end:
+        current = state()
+        age = current.get('ownClockexhaleAge', -1)
+        onset = previous_age < 0 and age >= 0 if clock_instrumented else current.get('particles', 0) > 0 and previous_particles == 0
+        if onset:
+            starts.append({'controllerTicks':current['controllerTicks'], 'gameTime':current['gameTime'], 'particles':current['particles'], 'sprinting':current['sprinting'], 'biome':current['biome'], 'ownClockAge':age, 'previewRemaining':current.get('previewRemaining')})
+        previous_particles = current.get('particles', 0)
+        previous_age = age
+        time.sleep(.1)
+    assert len(starts) >= (4 if clock_instrumented else 2), 'Normal cold breath did not cycle without preview'
+    periods = [b['controllerTicks']-a['controllerTicks'] for a,b in zip(starts, starts[1:])]
+    game_periods = [b['gameTime']-a['gameTime'] for a,b in zip(starts, starts[1:])]
+    (output / 'natural-cadence-trace.json').write_text(json.dumps({'clockInstrumented':clock_instrumented,'starts':starts,'controllerPeriods':periods,'gameTimePeriods':game_periods},indent=2))
+    assert all(start['previewRemaining'] is None or start['previewRemaining'] <= 0 for start in starts), 'Preview contaminated the natural cadence trace'
+    assert all(54 <= period <= 106 for period in periods), f'Idle cadence outside allowed interval: {periods}'
+    record('natural-cold-breath-cadence', dict(state(), plumeStarts=starts, periods=periods, gameTimePeriods=game_periods))
     send(actors=0, motion=0, cancelPreview=True, commands=['fillbiome -12 196 -12 12 220 12 minecraft:plains'])
     start_tick = state()['ticks']
     until(lambda s:s.get('ticks',0) >= start_tick+75 and s.get('particles') == 0, 25)
@@ -244,7 +278,10 @@ try:
     record('underwater-suppressed', state())
     send(commands=['fill -2 200 -2 2 203 2 minecraft:air','tp BreathQA 0 200 0'], drive='sneak', preview=True)
     shot('sneaking-breath', 2, camera='THIRD_PERSON_FRONT')
-    send(drive='none', commands=['summon minecraft:boat 0 200 0 {Type:oak}','ride BreathQA mount @e[type=minecraft:boat,limit=1,sort=nearest]'], preview=True)
+    send(drive='none')
+    until(lambda s:s.get('pose') == 'STANDING', 5)
+    time.sleep(1)
+    send(commands=['summon minecraft:boat 0 200 0 {Type:oak}','ride BreathQA mount @e[type=minecraft:boat,limit=1,sort=nearest]'], preview=True)
     until(lambda s:s.get('riding'), 10)
     shot('riding-breath', 2)
     send(commands=['ride BreathQA dismount','kill @e[type=minecraft:boat]'])

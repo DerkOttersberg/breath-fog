@@ -6,3 +6,5 @@ clientSideOnly=true
 modId="breath_fog_qa"
 version="1.0.0"
 displayName="Breath Fog QA (never distribute)"
+
+description="Development instrumentation for isolated acceptance; never distribute."

@@ -1,1 +1,98 @@
-Breath Fog Minecraft 1.20.1: port acceptance in progress. See docs/historical for previous-version evidence.
+BREATH FOG 1.0.0+mc1.20.1 — ACTUAL ACCEPTANCE REPORT
+Minecraft Java 1.20.1. Test date: 5 October 2026.
+
+SOURCE AND ARTIFACTS
+Version branch: https://github.com/DerkOttersberg/breath-fog/tree/1.20.1
+Production-source predecessor: 7979f6d6ecfd139b3f15722a96b2c5fe25693a61. Subsequent QA/documentation
+changes do not change the tested runtime JARs. .github/acceptance/acceptance.json
+records normalized production-source hashes, dependency pins and installed bytes.
+Mod ID breath_fog, local config filename and original CC0-1.0 licensing are preserved.
+
+Runtime JAR SHA-256:
+fabric: 7d51938885a3d590d5b9f874474c523403e14dd0f602a79509acefcf9864e8f7
+forge: eb80d5ed4b0d223f47f70899ea658ee324b255884bd87685d2ef3168ab93a1c8
+
+Runtime/source JARs, full source ZIP, checksums and report:
+C:/Users/derko/Desktop/minecraft/release-candidates/breath-fog/mc1.20.1
+Lightweight evidence, including retained failed attempts:
+C:/Users/derko/Desktop/minecraft/qa-artifacts/breath-fog-mc1.20.1
+Owned Linux staging: /root/breath-fog-1.20.1-20261005
+
+BUILD — PASSED
+Gradle 9.5.1 runs on Java 25; Java 17 compiles/runs Minecraft.
+Architectury 3.5.169, regular Loom 1.17.493, official Mojang mappings.
+Final clean check build: build-final9.log, exit 0, no build cache.
+11 JUnit tests executed, no skips/errors/failures; common-loader isolation passed.
+All 2 packaged runtime-JAR gates passed: exact metadata/version/license,
+matching Java 61 bytecode, common code, icon and eight additive sprites,
+128x128 soft / 16x16 pixel RGBA textures with transparent borders. QA/game/loader
+classes, foreign metadata and vanilla shader replacements are excluded.
+Installable remapJar outputs are tested in genuine production profiles:
+Fabric intermediary; Forge SRG members.
+Named development JARs are not installation artifacts. No runtime Architectury
+API or SeamlessLib dependency is required by this independent client visual mod.
+
+PACKAGED CLIENT MATRIX
+fabric standalone: fabric-standalone-2, 36 scenarios, PASSED.
+fabric combined: fabric-combined-2, 36 scenarios, PASSED.
+fabric standalone without Mod Menu: fabric-no-modmenu-1, 35 scenarios, PASSED.
+forge standalone: forge-standalone-2, 37 scenarios, PASSED.
+forge combined: forge-combined-1, 37 scenarios, PASSED.
+
+181 scenario executions across 5 accepted production profiles.
+The exact final runtime hash is checked against every installed profile. Official
+Minecraft/loader libraries provide the launch classpath; project classes/resources
+are absent. Separate remapped QA helper JARs drive internal controls and write
+PASS only after the actual client exits zero. Helpers are never releases.
+Combined profiles contain matching SeamlessLib, Meteors, Crafting, Workbench and
+Throw Weapons runtime JARs; their exact installed hashes are in the manifest.
+Each combined process verifies the pixel setting saved by the previous process.
+
+FEATURES EXERCISED
+Both styles, first person and both third-person cameras; sprinting/sneaking/riding;
+actual visibility buttons, Save/Cancel, NaN rejection, draft preservation through
+resize/pagination, native config factories and the real /breathfog config send path.
+Settings captures at GUI scales 2 and 3 are inspected. Mod Menu's actual registered
+factory is exercised in Fabric profiles where it is installed. Separate Fabric
+profiles omit Mod Menu and still pass commands, settings and the full visual suite.
+Resource reload reacquires sprites; a real filtering resource pack removes Breath
+Fog sprites and suspends emission; removing that pack restores rendered breath.
+A deterministic QA probe places an actual production BreathParticle against a real
+glass block and verifies collision fading. With 48 synthetic nearby actors, the
+controller selects the nearest 24 and stays below its 256-owned-particle cap.
+Natural cold breath cycles without preview; measured controller-tick intervals agree
+with idle cadence (unit tests validate exact 64–96 / 44–64 idle/sprint bounds).
+Warm plains suppress normal breath and allow local preview. Disable/style change,
+sleep/death/spectator/invisibility/submersion suppress or clean particles. Respawn
+restores emission. Forge's forced-10-FPS scenario preserves simulation cadence.
+Every standalone profile joins an entirely unmodded vanilla 1.20.1 loopback server
+and renders breath in its snowy biome, then disconnects with zero owned particles.
+This uses copied previously accepted QA EULA and offline development identities.
+Combined profiles test the modded integrated world; companion mods may require
+their loader on a remote server. No server installation is needed for Breath Fog.
+
+ISOLATION AND LOG REVIEW
+Ubuntu 24.04 WSL, private nonzero Xvfb, WSLg/Wayland targets removed, global
+single-client lock, two client CPUs, low priority, 1 GiB heap and 600-second runtime.
+The private wrapper may queue before that bounded runtime. No Windows game window
+or desktop input is used. Original profiles/worlds and unrelated processes remain
+untouched. Only verified owned vanilla servers are stopped after QA, using stdin
+when open or SIGTERM through Minecraft's graceful shutdown hook when input is closed.
+Actual graphics: OpenGL 4.6 Core Profile, llvmpipe LLVM 20.1.2, Mesa
+25.2.8-0ubuntu0.24.04.2. This is software rendering, not hardware acceptance.
+Offline Realms/authentication, missing narrator flite/OpenAL, loader-generated
+config/tag warnings and QA-resource-pack metadata warnings are classified in logs.
+The combined suite may log its existing Throw Weapons data-fixer diagnostic;
+this is a companion entity registration message, not a Breath Fog exception.
+The deliberate missing-sprite warning belongs to the recovery scenario. Passing
+profiles contain no Breath Fog exception. Earlier fixture/chunk loading, held sneak
+key, reload ordering and quit-sequence QA failures are retained without PASS.
+
+LIMITS
+No hardware GPU/performance benchmark, current shader-pack matrix, authenticated
+LAN, second actual guest, exhaustive modpack/resource-pack matrix, or legacy Vulkan
+backend is claimed. Synthetic actors are not actual network connections. Historical
+26.2 shader/multiplayer/hardware evidence remains distinct in docs/historical and
+evidence/. Server gameplay GameTests cannot exercise this client-only visual path;
+actual production client/world scenarios provide the applicable runtime gate.
+Hosted GitHub Actions status is separate from local build/runtime acceptance.
