@@ -56,7 +56,7 @@ With Java 25 selected: `./gradlew clean check build` (`gradlew.bat` on Windows).
 
 `check` runs the portable unit tests, common-loader isolation, and all three packaged-JAR checks. See [TESTING.txt](TESTING.txt) for exact runtime evidence and limits. The separately packaged `-Pqa :fabric:qaHelperJar :forge:qaHelperJar :neoforge:qaHelperJar` instrumentation is never included in a runtime JAR. [.github/scripts/playtest_isolated.py](.github/scripts/playtest_isolated.py) drives copied production profiles through a private WSL Xvfb display.
 
-See [MIGRATION.md](MIGRATION.md), [PORTING.md](PORTING.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [art/ASSETS.md](art/ASSETS.md). Original code and assets are dedicated under CC0.
+See [MIGRATION.md](MIGRATION.md), [PORTING.md](PORTING.md), [ARCHITECTURE.md](ARCHITECTURE.md), and [art/ASSETS.md](art/ASSETS.md). Earlier CC0 material retains its original terms; see the License section for the current policy and preserved notices.
 
 ## License
 
