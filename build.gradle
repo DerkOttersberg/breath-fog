@@ -75,9 +75,11 @@ tasks.register('verifyLoaderJar') {
                 if (entries.any { it.contains('/qa/') || it.contains('/gametest/') || it.startsWith('net/minecraft/') || it.startsWith('net/fabricmc/') || it.startsWith('com/derko/seamlessapi/') || it.startsWith('assets/minecraft/shaders/') } || foreign.any { it in entries })
                     throw new GradleException("${loader}: development code/dependencies/foreign metadata leaked into jar")
                 def metadata = zip.getInputStream(zip.getEntry(metadataPath)).getText('UTF-8')
+                if (loader != 'fabric' && !metadata.contains('logoFile="assets/breath_fog/icon.png"')) throw new GradleException('Loader metadata must reference the bundled icon through logoFile')
                 if (!metadata.contains(project.version.toString()) || !metadata.contains('26.3') || !metadata.contains('CC0-1.0')) throw new GradleException("${loader}: invalid identity/runtime/license")
                 if (loader == 'fabric') {
                     def json = new groovy.json.JsonSlurper().parseText(metadata)
+                    if (json.icon != 'assets/breath_fog/icon.png') throw new GradleException('Fabric metadata must reference the bundled icon')
                     if (json.id != 'breath_fog' || json.environment != 'client' || json.depends.minecraft != '26.3' || json.depends.java != '>=25') throw new GradleException('Incorrect Fabric metadata')
                 }
                 def atlas = new groovy.json.JsonSlurper().parseText(zip.getInputStream(zip.getEntry('assets/minecraft/atlases/particles.json')).getText('UTF-8'))
