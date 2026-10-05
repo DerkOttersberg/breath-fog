@@ -85,6 +85,8 @@ def until(predicate, seconds=90):
         if process.poll() is not None:
             raise RuntimeError(f'Client exited {process.returncode}; see {output}/console.log')
         current = state()
+        if current.get('screen') in ('LoadingErrorScreen','ModLoadingErrorScreen'):
+            raise RuntimeError(f'Loader blocked startup on {current["screen"]}; inspect {output}/console.log')
         if predicate(current):
             return current
         time.sleep(0.2)
