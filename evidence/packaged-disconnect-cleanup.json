@@ -1,0 +1,21 @@
+{
+  "last": {
+    "id": "2311c3a5-cff0-4d23-9a49-896575106d57",
+    "ticks": 7170,
+    "world": false,
+    "particles": 0,
+    "peak": 60,
+    "error": "",
+    "screen": "GenericMessageScreen",
+    "camera": "THIRD_PERSON_BACK",
+    "fov": 70,
+    "throttle": "WINDOW_ICONIFIED",
+    "emitters": 0,
+    "actors": 0
+  },
+  "label": "packaged-disconnect-cleanup",
+  "errors": [],
+  "seconds": 3,
+  "maximumParticles": 0.0,
+  "maximumEmitters": 0.0
+}

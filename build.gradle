@@ -1,0 +1,86 @@
+plugins {
+    id 'base'
+    alias(libs.plugins.architectury)
+    alias(libs.plugins.loom) apply false
+}
+architectury { minecraft = libs.versions.minecraft.get() }
+allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.terraformersmc.com/releases/' }
+    }
+}
+subprojects {
+    apply plugin: 'java-library'
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(libs.versions.java.get().toInteger())
+        withSourcesJar()
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = libs.versions.java.get().toInteger()
+    }
+    tasks.withType(Test).configureEach { useJUnitPlatform() }
+    tasks.withType(Jar).configureEach {
+        from(rootProject.file('LICENSE.txt')) { into 'META-INF'; rename { 'LICENSE_breath-fog.txt' } }
+    }
+}
+def cleans = allprojects.collect { it.tasks.named('clean') }
+allprojects { tasks.configureEach { task -> if (task.name != 'clean') task.mustRunAfter(cleans) } }
+
+tasks.register('verifyCommonIsolation') {
+    group = 'verification'
+    inputs.files(fileTree('common/src') { include '**/*.java' })
+    doLast {
+        def forbidden = ['net.fabricmc.', 'net.minecraftforge.', 'net.neoforged.']
+        def violations = []
+        inputs.files.each { file -> file.eachLine { line, n ->
+            if (forbidden.any { line.contains(it) }) violations << "${file}:${n}"
+        } }
+        if (violations) throw new GradleException("Loader references in common: ${violations}")
+        fileTree('common/src/main/java/io/github/derkottersberg/breathfog/core').matching { include '**/*.java' }.each { file ->
+            if (file.text.contains('net.minecraft.')) throw new GradleException("Minecraft reference in portable core: ${file}")
+        }
+    }
+}
+tasks.register('verifyLoaderJar') {
+    group = 'verification'
+    dependsOn ':fabric:jar'
+    def jarFile = project(':fabric').tasks.named('jar', Jar).flatMap { it.archiveFile }
+    inputs.file(jarFile)
+    doLast {
+        new java.util.zip.ZipFile(jarFile.get().asFile).withCloseable { zip ->
+            def required = ['fabric.mod.json', 'pack.mcmeta', 'io/github/derkottersberg/breathfog/client/BreathFogClient.class',
+                'io/github/derkottersberg/breathfog/core/BreathClock.class', 'META-INF/LICENSE_breath-fog.txt',
+                'assets/minecraft/atlases/particles.json', 'assets/breath_fog/icon.png']
+            (0..3).each { required << "assets/breath_fog/textures/particle/wisp_${it}.png" }
+            required.each { if (zip.getEntry(it) == null) throw new GradleException("Missing jar entry: ${it}") }
+            def metadata = new groovy.json.JsonSlurper().parseText(zip.getInputStream(zip.getEntry('fabric.mod.json')).getText('UTF-8'))
+            if (metadata.id != 'breath_fog' || metadata.environment != 'client' || metadata.version != rootProject.mod_version)
+                throw new GradleException('Incorrect packaged identity or environment')
+            if (metadata.depends.minecraft != '26.2' || metadata.depends.java != '>=25') throw new GradleException('Incorrect runtime requirements')
+            if (metadata.entrypoints.main || metadata.mixins || metadata.entrypoints.client != ['io.github.derkottersberg.breathfog.fabric.BreathFogFabricClient'])
+                throw new GradleException('The MVP must have only a client bootstrap and optional Mod Menu integration')
+            def entries = zip.entries().toList()*.name
+            if (entries.any { it.contains('/qa/') || it.contains('/gametest/') || it.startsWith('net/minecraft/') || it.startsWith('net/fabricmc/') || it.contains('mixins') || it.startsWith('assets/minecraft/shaders/') || it.endsWith('mods.toml') })
+                throw new GradleException('Development code, dependencies, mixins, or foreign loader metadata leaked into jar')
+            def atlas = new groovy.json.JsonSlurper().parseText(zip.getInputStream(zip.getEntry('assets/minecraft/atlases/particles.json')).getText('UTF-8'))
+            if (atlas.sources.size() != 4 || atlas.sources.any { it.type != 'minecraft:single' || !it.resource.startsWith('breath_fog:') })
+                throw new GradleException('Atlas must only add the four namespaced vapor sprites')
+            (0..3).each { i ->
+                def sprite = javax.imageio.ImageIO.read(zip.getInputStream(zip.getEntry("assets/breath_fog/textures/particle/wisp_${i}.png")))
+                if (sprite.width != 128 || sprite.height != 128 || !sprite.colorModel.hasAlpha()) throw new GradleException('Vapor sprites must be 128x128 with alpha')
+                (0..127).each { p ->
+                    if ([sprite.getRGB(p,0),sprite.getRGB(p,127),sprite.getRGB(0,p),sprite.getRGB(127,p)].any { ((it >>> 24) & 255) != 0 })
+                        throw new GradleException('Vapor sprite borders must be fully transparent')
+                }
+            }
+        }
+    }
+}
+tasks.named('assemble') { dependsOn ':fabric:assemble' }
+tasks.named('check') { dependsOn ':common:check', ':fabric:check', 'verifyCommonIsolation', 'verifyLoaderJar' }

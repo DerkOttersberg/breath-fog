@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="io.github.derkottersberg.breathfog.core.FogPolicyTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-05T13:21:31.422Z" hostname="DERKLAPTOP" time="0.014">
+  <properties/>
+  <testcase name="coldPolicyIncludesTaigaAndModdedTagsWithoutIncludingWarmBiomes()" classname="io.github.derkottersberg.breathfog.core.FogPolicyTest" time="0.001"/>
+  <testcase name="idleAndSprintCadencesStayInsideSpecifiedRanges()" classname="io.github.derkottersberg.breathfog.core.FogPolicyTest" time="0.004"/>
+  <testcase name="cameraNeverBlindsCrosshairAndFadeEnvelopeHasNoHardEndpoints()" classname="io.github.derkottersberg.breathfog.core.FogPolicyTest" time="0.001"/>
+  <testcase name="completeExhalationsAllocateExactDistanceBudget()" classname="io.github.derkottersberg.breathfog.core.FogPolicyTest" time="0.001"/>
+  <testcase name="wakesDisturbNearbyVaporButIgnoreStationaryPlayersAndTeleports()" classname="io.github.derkottersberg.breathfog.core.FogPolicyTest" time="0.002"/>
+  <testcase name="playersHaveDifferentInitialPhasesAndSuppressionQueuesNoCatchup()" classname="io.github.derkottersberg.breathfog.core.FogPolicyTest" time="0.001"/>
+  <testcase name="analyticFlowIsBoundedSmoothAndApproximatelyDivergenceFree()" classname="io.github.derkottersberg.breathfog.core.FogPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,7 @@
+[14:49:45] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 26.2 with Fabric Loader 0.19.3
+[14:49:56] [Render thread/INFO] (BreathFogClient) Breath Fog initialized on Fabric. Local particles only; no network channels.
+[14:49:57] [Render thread/INFO] (Iris) Shaders are disabled because enableShaders is set to false in iris.properties
+[14:50:01] [Render thread/INFO] (Minecraft) Created: 1024x512x0 minecraft:textures/atlas/particles.png-atlas
+[14:50:06] [Server thread/INFO] (Minecraft) Player80 joined the game
+[14:50:48] [Render thread/INFO] (Iris) Shaders are disabled because enableShaders is set to false in iris.properties
+[14:56:33] [Render thread/INFO] (Minecraft) [System] [CHAT] VanillaGuest3 joined the game

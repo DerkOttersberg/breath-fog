@@ -1,0 +1,25 @@
+{
+  "maximumEmitters": 0.0,
+  "seconds": 3,
+  "last": {
+    "id": "a35dda6f-8b8a-4092-873b-009ecc9e3b73",
+    "ticks": 5960,
+    "world": true,
+    "particles": 0,
+    "peak": 60,
+    "error": "",
+    "screen": "none",
+    "camera": "FIRST_PERSON",
+    "fov": 70,
+    "throttle": "NONE",
+    "emitters": 0,
+    "actors": 0,
+    "position": "(-189.5, 66.0, -745.5)",
+    "biome": "minecraft:snowy_taiga",
+    "players": 1,
+    "name": "JarSmoke"
+  },
+  "errors": [],
+  "label": "packaged-disabled-cleanup",
+  "maximumParticles": 0.0
+}

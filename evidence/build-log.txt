@@ -1,0 +1,64 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/C:/Users/derko/.gradle/wrapper/dists/gradle-9.5.1-bin/iq79hdu3mqx29lgffhp8bfmx/gradle-9.5.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+
+> Configure project :
+Architect Plugin: 3.5.169
+
+> Configure project :common
+Architectury Loom: 1.17.491
+
+> Task :clean
+> Task :fabric:clean
+> Task :common:clean
+> Task :fabric:processResources
+> Task :fabric:processIncludeJars
+> Task :verifyCommonIsolation
+> Task :fabric:sourcesJar
+> Task :fabric:processTestResources NO-SOURCE
+> Task :fabric:validateAccessWidener NO-SOURCE
+
+> Task :common:compileJava
+Note: C:\Users\derko\Documents\Codex\2026-10-05\ana\work\breath-fog\common\src\main\java\io\github\derkottersberg\breathfog\client\BreathFogClient.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :common:processResources
+> Task :common:classes
+> Task :common:processIncludeJars
+> Task :common:jar
+> Task :common:sourcesJar
+> Task :common:compileTestJava
+> Task :common:processTestResources NO-SOURCE
+> Task :common:testClasses
+> Task :fabric:compileJava
+> Task :fabric:classes
+> Task :fabric:compileTestJava NO-SOURCE
+> Task :fabric:testClasses UP-TO-DATE
+> Task :fabric:jar
+> Task :fabric:assemble
+> Task :verifyLoaderJar
+> Task :assemble
+> Task :common:test
+> Task :common:validateAccessWidener NO-SOURCE
+> Task :common:check
+> Task :common:assemble
+> Task :common:build
+> Task :common:exportClasspath
+> Task :fabric:test NO-SOURCE
+> Task :fabric:check UP-TO-DATE
+> Task :fabric:build
+> Task :check
+> Task :build
+
+[Incubating] Problems report is available at: file:///C:/Users/derko/Documents/Codex/2026-10-05/ana/work/breath-fog/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 5s
+18 actionable tasks: 18 executed

@@ -1,0 +1,45 @@
+BREATH FOG — 26.2 FABRIC MVP
+
+Install
+1. Select Minecraft 26.2 with Java 25 and Fabric Loader 0.19.3.
+   Fabric installer: https://fabricmc.net/use/installer/
+2. Put Fabric API 0.159.0+26.2 and
+   breath-fog-0.1.0+mc26.2-fabric.jar into that profile's mods folder.
+   Fabric API: https://modrinth.com/mod/fabric-api
+3. Launch the game. Visit a snowy or chilly biome, such as taiga,
+   or run /breathfog preview for a 20-second local preview anywhere.
+4. Try first person and both third-person views with F5.
+   Open /breathfog config to adjust visibility and density.
+
+Only your client needs the mod. Servers and other players do not.
+Nearby players can show breath even if their game is unmodded.
+Each viewer simulates their own breathing timing.
+
+Shaders
+Iris and Sodium are optional. Use builds for Minecraft 26.2.
+The tested versions and remaining checks are listed in Test-report.txt.
+The mod includes its own textures and icon: no extra resource pack needed.
+
+Defaults
+Enabled; visible in first and third person; nearby players enabled;
+intensity 1.0; first-person strength 1.0. The config is
+config/breath_fog.json inside your Minecraft profile.
+Cold detection includes biome temperatures below 0.5 and c:is_cold.
+Indoors still uses the biome rule. Submerged, invisible, dead, sleeping,
+and spectating players do not emit.
+
+If the breath is too subtle, raise intensity or first-person strength in
+the settings screen. The center of your view is intentionally attenuated.
+Minecraft's Minimal particle setting reduces the effect substantially.
+Preview respects visibility and suppression settings, including the main switch.
+
+Source and porting
+Extract breath-fog-source-0.1.0+mc26.2.zip. README.md explains building,
+ARCHITECTURE.md explains the design, and PORTING.md explains how to add
+loaders and Minecraft version branches. On Windows, build.ps1 obtains a
+project-local Java 25 toolchain; it leaves system Java unchanged.
+
+No server packets, custom particle registries, gameplay changes,
+renderer mixins, core-shader replacements, or world save data are added.
+This is an MVP; consult the actual test report before relying on an
+untested shader pack, loader, version, or multiplayer configuration.

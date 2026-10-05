@@ -1,0 +1,54 @@
+[
+  {
+    "name": "wisp_0",
+    "size": [
+      128,
+      128
+    ],
+    "alpha_extrema": [
+      0,
+      252
+    ],
+    "partial_alpha_pixels": 3639,
+    "maximum_edge_alpha": 0
+  },
+  {
+    "name": "wisp_1",
+    "size": [
+      128,
+      128
+    ],
+    "alpha_extrema": [
+      0,
+      253
+    ],
+    "partial_alpha_pixels": 2643,
+    "maximum_edge_alpha": 0
+  },
+  {
+    "name": "wisp_2",
+    "size": [
+      128,
+      128
+    ],
+    "alpha_extrema": [
+      0,
+      246
+    ],
+    "partial_alpha_pixels": 5864,
+    "maximum_edge_alpha": 0
+  },
+  {
+    "name": "wisp_3",
+    "size": [
+      128,
+      128
+    ],
+    "alpha_extrema": [
+      0,
+      252
+    ],
+    "partial_alpha_pixels": 3188,
+    "maximum_edge_alpha": 0
+  }
+]

@@ -1,0 +1,18 @@
+{
+  "id": "fb446b33-7b22-4810-9fb9-727340a9eff0",
+  "ticks": 4590,
+  "world": true,
+  "particles": 3,
+  "peak": 60,
+  "error": "",
+  "screen": "none",
+  "camera": "THIRD_PERSON_FRONT",
+  "fov": 70,
+  "throttle": "NONE",
+  "emitters": 1,
+  "actors": 0,
+  "position": "(-189.5, 66.0, -745.5)",
+  "biome": "minecraft:snowy_taiga",
+  "players": 1,
+  "name": "JarSmoke"
+}

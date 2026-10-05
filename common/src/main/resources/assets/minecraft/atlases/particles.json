@@ -1,0 +1,6 @@
+{"sources":[
+  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_0"},
+  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_1"},
+  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_2"},
+  {"type":"minecraft:single","resource":"breath_fog:particle/wisp_3"}
+]}

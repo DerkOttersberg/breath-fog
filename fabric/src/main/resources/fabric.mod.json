@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "breath_fog",
+  "version": "${version}",
+  "name": "Breath Fog",
+  "description": "Airy, responsive breath vapor in cold biomes. Subtle in first person, atmospheric in third person, entirely client-side.",
+  "authors": ["Derk Ottersberg"],
+  "license": "CC0-1.0",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["io.github.derkottersberg.breathfog.fabric.BreathFogFabricClient"],
+    "modmenu": ["io.github.derkottersberg.breathfog.fabric.BreathFogModMenu"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "fabric-api": ">=0.159.0 <0.160.0",
+    "minecraft": "26.2",
+    "java": ">=25"
+  },
+  "suggests": { "modmenu": ">=20.0.3" },
+  "icon": "assets/breath_fog/icon.png"
+}

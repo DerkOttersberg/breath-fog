@@ -1,0 +1,25 @@
+{
+  "maximumParticles": 12.0,
+  "maximumEmitters": 2.0,
+  "last": {
+    "id": "multiplayer-final-shot",
+    "ticks": 14390,
+    "world": true,
+    "particles": 0,
+    "peak": 69,
+    "error": "",
+    "screen": "none",
+    "camera": "FIRST_PERSON",
+    "fov": 70,
+    "throttle": "NONE",
+    "emitters": 2,
+    "actors": 0,
+    "position": "(0.5, 65.0, 0.5)",
+    "biome": "minecraft:snowy_taiga",
+    "players": 2,
+    "name": "Player80"
+  },
+  "errors": [],
+  "seconds": 6,
+  "label": "unmodded-player-breath"
+}

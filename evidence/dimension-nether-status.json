@@ -1,0 +1,18 @@
+{
+  "id": "genuine-multiplayer",
+  "ticks": 12410,
+  "world": true,
+  "particles": 0,
+  "peak": 69,
+  "error": "",
+  "screen": "none",
+  "camera": "FIRST_PERSON",
+  "fov": 70,
+  "throttle": "NONE",
+  "emitters": 1,
+  "actors": 0,
+  "position": "(0.5, 100.0, 0.5)",
+  "biome": "minecraft:crimson_forest",
+  "players": 1,
+  "name": "Player80"
+}

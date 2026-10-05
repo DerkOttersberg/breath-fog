@@ -1,0 +1,20 @@
+[15:21:45] [main/INFO]: Loading Minecraft 26.2 with Fabric Loader 0.19.3
+[15:21:55] [Render thread/INFO]: Breath Fog initialized on Fabric. Local particles only; no network channels.
+[15:21:57] [Render thread/INFO]: Shaders are disabled because enableShaders is set to false in iris.properties
+[15:22:00] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/particles.png-atlas
+[15:22:40] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/particles.png-atlas
+[15:22:55] [Render thread/INFO]: Shaders are disabled because enableShaders is set to false in iris.properties
+[15:23:00] [Render thread/INFO]: Profile: HIGH (+0 options changed by user)
+[15:23:01] [Render thread/INFO]: Using shaderpack: ComplementaryReimagined_r5.9.3.zip
+[15:23:09] [Render thread/INFO]: Profile: HIGH (+0 options changed by user)
+[15:23:09] [Render thread/INFO]: Using shaderpack: BSL_v10.1.8.zip
+[15:23:18] [Render thread/INFO]: Shaders are disabled because enableShaders is set to false in iris.properties
+[15:23:29] [Render thread/INFO]: Shaders are disabled because enableShaders is set to false in iris.properties
+[15:25:06] [Render thread/INFO]: Shaders are disabled because enableShaders is set to false in iris.properties
+[15:25:26] [Render thread/INFO]: Profile: HIGH (+0 options changed by user)
+[15:25:26] [Render thread/INFO]: Using shaderpack: ComplementaryReimagined_r5.9.3.zip
+[15:25:42] [Render thread/INFO]: Profile: HIGH (+0 options changed by user)
+[15:25:42] [Render thread/INFO]: Using shaderpack: BSL_v10.1.8.zip
+[15:25:57] [Render thread/INFO]: Shaders are disabled because enableShaders is set to false in iris.properties
+[15:27:06] [Render thread/INFO]: [System] [CHAT] Breath Fog preview: 20 seconds. Try both camera views.
+[15:27:08] [Render thread/INFO]: Created: 1024x512x0 minecraft:textures/atlas/particles.png-atlas

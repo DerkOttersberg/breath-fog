@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "breath_fog_qa",
+  "version": "1.0.0",
+  "name": "Breath Fog development QA helper",
+  "environment": "client",
+  "entrypoints": { "client": ["io.github.derkottersberg.breathfog.qa.QaClient"] },
+  "depends": { "breath_fog": "*", "fabric-api": "*" }
+}

@@ -1,0 +1,25 @@
+{
+  "seconds": 6,
+  "errors": [],
+  "maximumParticles": 0.0,
+  "label": "submerged-suppression",
+  "maximumEmitters": 2.0,
+  "last": {
+    "id": "remote-only-shot",
+    "ticks": 17020,
+    "world": true,
+    "particles": 0,
+    "peak": 69,
+    "error": "",
+    "screen": "none",
+    "camera": "FIRST_PERSON",
+    "fov": 70,
+    "throttle": "NONE",
+    "emitters": 2,
+    "actors": 0,
+    "position": "(0.5, 65.0, 0.5)",
+    "biome": "minecraft:snowy_taiga",
+    "players": 2,
+    "name": "Player80"
+  }
+}

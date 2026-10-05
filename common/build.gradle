@@ -1,0 +1,11 @@
+plugins { id 'dev.architectury.loom-no-remap' }
+dependencies {
+    minecraft libs.minecraft
+    // Annotation definitions present on Loom's merged Minecraft jar; no loader code is used by common.
+    compileOnly libs.fabric.loader
+    testImplementation platform(libs.junit.bom)
+    testImplementation libs.junit.jupiter
+    testImplementation libs.gson
+    testRuntimeOnly libs.junit.platform.launcher
+}
+tasks.named('jar', Jar) { archiveFileName = "breath-fog-${project.version}-common.jar" }

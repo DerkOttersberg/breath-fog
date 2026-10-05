@@ -1,0 +1,18 @@
+{
+  "id": "31564ed6-b6d1-46a3-997a-32f2b1424770",
+  "ticks": 7060,
+  "world": true,
+  "particles": 5,
+  "peak": 60,
+  "error": "",
+  "screen": "none",
+  "camera": "THIRD_PERSON_BACK",
+  "fov": 70,
+  "throttle": "NONE",
+  "emitters": 1,
+  "actors": 0,
+  "position": "(-194.62001888759275, 63.0, -728.4843210807554)",
+  "biome": "minecraft:frozen_river",
+  "players": 1,
+  "name": "JarSmoke"
+}
